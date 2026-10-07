@@ -17,14 +17,13 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>
-                <Navbar />
+                <ReduxProvider>
+                    <Navbar />
 
-                <main className="min-h-screen">{children}</main>
+                    <main className="min-h-screen">{children}</main>
 
-                <Footer />
+                    <Footer />
                 </ReduxProvider>
-
-                
             </body>
         </html>
     );
