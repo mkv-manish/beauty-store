@@ -40,7 +40,7 @@ export default function Navbar() {
                     <img
                         src="/images/logo/logo.png"
                         alt="Dermisca"
-                        className="h-12 w-auto object-contain"
+                        className="h-16 w-auto object-contain"
                     />{" "}
                 </Link>{" "}
                 {/* Desktop Navigation */}{" "}

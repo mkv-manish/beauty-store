@@ -10,8 +10,11 @@ type Product = {
     _id: string;
     name: string;
     price: number;
-    category: string;
+    category: "skin" | "hair";
     image: string;
+    description: string;
+    ingredients: string;
+    howToUse: string;
     stock: number;
 };
 
@@ -86,8 +89,12 @@ export default function BestSellers() {
 
                                 <div className="space-y-3 p-4">
                                     <div className="h-3 w-20 animate-pulse rounded bg-[#EDE8E0]" />
+
                                     <div className="h-5 w-3/4 animate-pulse rounded bg-[#EDE8E0]" />
+
                                     <div className="h-5 w-16 animate-pulse rounded bg-[#EDE8E0]" />
+
+                                    <div className="h-10 animate-pulse rounded-xl bg-[#EDE8E0]" />
                                 </div>
                             </div>
                         ))}
@@ -114,11 +121,7 @@ export default function BestSellers() {
                 {!loading && !error && products.length > 0 && (
                     <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
                         {products.map((product, index) => (
-                            <ProductCard
-                                key={product._id}
-                                product={product}
-                                index={index}
-                            />
+                            <ProductCard key={product._id} product={product} />
                         ))}
                     </div>
                 )}
