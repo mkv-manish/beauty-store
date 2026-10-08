@@ -1,11 +1,35 @@
 import { NextResponse } from "next/server";
+
 import { connectDB } from "@/lib/db";
 import Product from "@/models/Product";
 import Order from "@/models/Order";
+import { verifyToken } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
     await connectDB();
+
+    const authHeader = request.headers.get("authorization");
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { message: "Please login to place an order." },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    let decoded;
+
+    try {
+      decoded = verifyToken(token);
+    } catch {
+      return NextResponse.json(
+        { message: "Invalid or expired token." },
+        { status: 401 }
+      );
+    }
 
     const body = await request.json();
 
@@ -31,7 +55,9 @@ export async function POST(request: Request) {
 
     if (products.length !== items.length) {
       return NextResponse.json(
-        { message: "One or more products were not found." },
+        {
+          message: "One or more products were not found.",
+        },
         { status: 400 }
       );
     }
@@ -74,6 +100,7 @@ export async function POST(request: Request) {
     }
 
     const order = await Order.create({
+      user: decoded.userId,
       name,
       phone,
       address,
@@ -104,7 +131,9 @@ export async function POST(request: Request) {
     );
   } catch {
     return NextResponse.json(
-      { message: "Failed to place order." },
+      {
+        message: "Failed to place order.",
+      },
       { status: 500 }
     );
   }

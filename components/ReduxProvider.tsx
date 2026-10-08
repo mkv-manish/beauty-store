@@ -1,31 +1,44 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { store, RootState } from "@/store/store";
 import { setCart } from "@/store/cartSlice";
+
+const CART_STORAGE_KEY = "dermiscaa-cart";
 
 function CartPersistence({ children }: { children: React.ReactNode }) {
     const dispatch = useDispatch();
 
     const items = useSelector((state: RootState) => state.cart.items);
 
-    useEffect(() => {
-        const savedCart = localStorage.getItem("natura-glow-cart");
+    const [loaded, setLoaded] = useState(false);
 
-        if (savedCart) {
-            try {
+    // Load cart only once when the app starts
+    useEffect(() => {
+        try {
+            const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+
+            if (savedCart) {
                 const cartItems = JSON.parse(savedCart);
-                dispatch(setCart(cartItems));
-            } catch {
-                localStorage.removeItem("natura-glow-cart");
+
+                if (Array.isArray(cartItems)) {
+                    dispatch(setCart(cartItems));
+                }
             }
+        } catch {
+            localStorage.removeItem(CART_STORAGE_KEY);
+        } finally {
+            setLoaded(true);
         }
     }, [dispatch]);
 
+    // Save cart only after localStorage has been loaded
     useEffect(() => {
-        localStorage.setItem("natura-glow-cart", JSON.stringify(items));
-    }, [items]);
+        if (!loaded) return;
+
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+    }, [items, loaded]);
 
     return children;
 }
