@@ -64,6 +64,7 @@ export default function CheckoutPage() {
                     phone,
                     address,
                     paymentMethod: "COD",
+
                     items: items.map((item) => ({
                         product: item._id,
                         quantity: item.quantity,
@@ -77,6 +78,7 @@ export default function CheckoutPage() {
                 throw new Error(data.message || "Unable to place order.");
             }
 
+            // Clear cart only after successful order
             dispatch(clearCart());
 
             router.push(`/checkout/success?orderId=${data.order._id}`);

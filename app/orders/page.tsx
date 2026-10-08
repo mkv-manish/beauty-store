@@ -150,7 +150,7 @@ export default function OrdersPage() {
                     </h1>
 
                     <p className="mt-2 text-sm text-[#687169]">
-                        View your Dermiscaa order history.
+                        View your Dermisca order history.
                     </p>
                 </motion.div>
 

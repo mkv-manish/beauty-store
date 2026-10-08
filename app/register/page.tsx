@@ -58,7 +58,7 @@ export default function RegisterPage() {
                 {/* Left Side */}
                 <div className="order-2 flex min-h-[260px] flex-col justify-center bg-[#E8CFC8] px-6 py-10 text-[#26332A] sm:px-10 md:order-1 md:min-h-[600px] md:px-12">
                     <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#71806A]">
-                        Natura Glow
+                        Dermisca
                     </p>
 
                     <h1 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl">
@@ -85,7 +85,7 @@ export default function RegisterPage() {
                         </h2>
 
                         <p className="mt-2 text-gray-500">
-                            Join Natura Glow and start shopping.
+                            Join Dermisca and start shopping.
                         </p>
 
                         <form onSubmit={handleSubmit} className="mt-8">

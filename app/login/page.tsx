@@ -54,7 +54,7 @@ export default function LoginPage() {
                 {/* Left Side */}
                 <div className="flex min-h-[260px] flex-col justify-center bg-[#71806A] px-6 py-10 text-white sm:px-10 md:min-h-[560px] md:px-12">
                     <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#F9F5EE]">
-                        Natura Glow
+                        Dermisca
                     </p>
 
                     <h1 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl">
@@ -81,7 +81,7 @@ export default function LoginPage() {
                         </h2>
 
                         <p className="mt-2 text-gray-500">
-                            Login to your Natura Glow account.
+                            Login to your Dermisca account.
                         </p>
 
                         <form onSubmit={handleSubmit} className="mt-8">

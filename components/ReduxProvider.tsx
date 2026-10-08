@@ -5,7 +5,7 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import { store, RootState } from "@/store/store";
 import { setCart } from "@/store/cartSlice";
 
-const CART_STORAGE_KEY = "dermiscaa-cart";
+const CART_STORAGE_KEY = "dermisca-cart";
 
 function CartPersistence({ children }: { children: React.ReactNode }) {
     const dispatch = useDispatch();

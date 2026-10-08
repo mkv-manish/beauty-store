@@ -5,9 +5,7 @@ import mongoose from "mongoose";
 import Product from "../models/Product";
 
 const products = [
-  // -------------------------
   // Skin Care
-  // -------------------------
   {
     name: "Gentle Face Wash",
     price: 299,
@@ -80,9 +78,8 @@ const products = [
     stock: 35,
   },
 
-  // -------------------------
   // Hair Care
-  // -------------------------
+
   {
     name: "Daily Care Shampoo",
     price: 399,

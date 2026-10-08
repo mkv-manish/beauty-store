@@ -12,7 +12,7 @@ export default function Footer() {
                             href="/"
                             className="text-2xl font-bold tracking-tight text-[#26352B]"
                         >
-                            Dermiscaa
+                            Dermisca
                         </Link>
 
                         <p className="mt-4 max-w-sm text-sm leading-6 text-[#687169]">
@@ -65,7 +65,7 @@ export default function Footer() {
                     {/* Connect */}
                     <div>
                         <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-[#26352B]">
-                            Dermiscaa Care
+                            Dermisca Care
                         </h3>
 
                         <p className="mt-5 text-sm leading-6 text-[#687169]">
@@ -77,7 +77,7 @@ export default function Footer() {
 
                 <div className="mt-10 border-t border-[#E7E2DA] pt-6 text-center">
                     <p className="text-xs text-[#687169]">
-                        © 2026 Dermiscaa. All rights reserved.
+                        © 2026 Dermisca. All rights reserved.
                     </p>
                 </div>
             </div>

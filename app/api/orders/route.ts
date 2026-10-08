@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 
 import { connectDB } from "@/lib/db";
 import Product from "@/models/Product";
@@ -9,77 +10,145 @@ export async function POST(request: Request) {
   try {
     await connectDB();
 
+    // Check authorization
     const authHeader = request.headers.get("authorization");
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(
-        { message: "Please login to place an order." },
+        {
+          message: "Please login to place an order.",
+        },
         { status: 401 }
       );
     }
 
     const token = authHeader.split(" ")[1];
 
-    let decoded;
+    let decoded: { userId: string };
 
     try {
-      decoded = verifyToken(token);
+      decoded = verifyToken(token) as { userId: string };
     } catch {
       return NextResponse.json(
-        { message: "Invalid or expired token." },
+        {
+          message: "Invalid or expired token.",
+        },
         { status: 401 }
       );
     }
 
+    // Get request body
     const body = await request.json();
 
-    const { name, phone, address, items } = body;
+    const {
+      name,
+      phone,
+      address,
+      items,
+    } = body;
 
-    if (!name || !phone || !address || !items?.length) {
+    // Basic validation
+    if (
+      !name ||
+      !phone ||
+      !address ||
+      !Array.isArray(items) ||
+      items.length === 0
+    ) {
       return NextResponse.json(
         {
-          message:
-            "Name, phone, address and cart items are required.",
+          message: "Name, phone, address and cart items are required.",
         },
         { status: 400 }
       );
     }
 
-    const productIds = items.map(
-      (item: { productId: string }) => item.productId
-    );
+    /*
+      Checkout sends:
 
-    const products = await Product.find({
-      _id: { $in: productIds },
+      {
+        product: item._id,
+        quantity: item.quantity
+      }
+
+      We also support productId just in case
+      another page sends that field.
+    */
+
+    const productIds = items.map((item: any) => {
+      return item.product || item.productId;
     });
 
-    if (products.length !== items.length) {
-      return NextResponse.json(
-        {
-          message: "One or more products were not found.",
-        },
-        { status: 400 }
-      );
+    // Check invalid product IDs
+    for (const productId of productIds) {
+      if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
+        return NextResponse.json(
+          {
+            message: "Invalid product ID.",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Get products from database
+    const products = await Product.find({
+      _id: {
+        $in: productIds,
+      },
+    });
+
+    // Create quick product lookup
+    const productMap = new Map(
+      products.map((product) => [
+        product._id.toString(),
+        product,
+      ])
+    );
+
+    // Check all products exist
+    for (const productId of productIds) {
+      if (!productMap.has(productId.toString())) {
+        return NextResponse.json(
+          {
+            message: "One or more products were not found.",
+          },
+          { status: 400 }
+        );
+      }
     }
 
     let total = 0;
 
     const orderItems = [];
 
+    // Prepare order items
     for (const item of items) {
-      const product = products.find(
-        (product) =>
-          product._id.toString() === item.productId
-      );
+      const productId = item.product || item.productId;
+      const quantity = Number(item.quantity);
 
-      if (!product) {
+      if (!quantity || quantity < 1) {
         return NextResponse.json(
-          { message: "Product not found." },
+          {
+            message: "Invalid product quantity.",
+          },
           { status: 400 }
         );
       }
 
-      if (product.stock < item.quantity) {
+      const product = productMap.get(productId.toString());
+
+      if (!product) {
+        return NextResponse.json(
+          {
+            message: "Product not found.",
+          },
+          { status: 400 }
+        );
+      }
+
+      // Check stock
+      if (product.stock < quantity) {
         return NextResponse.json(
           {
             message: `${product.name} does not have enough stock.`,
@@ -88,17 +157,19 @@ export async function POST(request: Request) {
         );
       }
 
-      total += product.price * item.quantity;
+      // Calculate total using database price
+      total += product.price * quantity;
 
       orderItems.push({
         product: product._id,
         name: product.name,
         price: product.price,
-        quantity: item.quantity,
+        quantity,
         image: product.image,
       });
     }
 
+    // Create order
     const order = await Order.create({
       user: decoded.userId,
       name,
@@ -110,14 +181,15 @@ export async function POST(request: Request) {
       status: "Pending",
     });
 
+    // Reduce product stock
     for (const item of items) {
-      const product = products.find(
-        (product) =>
-          product._id.toString() === item.productId
-      );
+      const productId = item.product || item.productId;
+      const quantity = Number(item.quantity);
+
+      const product = productMap.get(productId.toString());
 
       if (product) {
-        product.stock -= item.quantity;
+        product.stock -= quantity;
         await product.save();
       }
     }
@@ -129,7 +201,9 @@ export async function POST(request: Request) {
       },
       { status: 201 }
     );
-  } catch {
+  } catch (error) {
+    console.error("PLACE ORDER ERROR:", error);
+
     return NextResponse.json(
       {
         message: "Failed to place order.",

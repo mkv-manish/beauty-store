@@ -19,7 +19,7 @@ export default function CheckoutSuccessPage() {
                 </h1>
 
                 <p className="mt-3 leading-6 text-gray-600">
-                    Thank you for shopping with Natura Glow. Your order has been
+                    Thank you for shopping with Dermisca. Your order has been
                     placed successfully.
                 </p>
 
