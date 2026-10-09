@@ -28,9 +28,9 @@ export default function HeroBanner() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="relative w-full overflow-hidden"
+            className="relative m-0 w-full overflow-hidden bg-white p-0"
         >
-            <div className="relative aspect-[1920/800] w-full">
+            <div className="relative aspect-[4/3] w-full sm:aspect-[16/7] md:aspect-[1920/800]">
                 {heroBanners.map((banner, index) => (
                     <motion.div
                         key={banner}
@@ -47,23 +47,26 @@ export default function HeroBanner() {
                     >
                         <Image
                             src={banner}
-                            alt={`Dermiscaa beauty banner ${index + 1}`}
+                            alt={`Dermisca beauty banner ${index + 1}`}
                             fill
                             priority={index === 0}
                             sizes="100vw"
-                            className="object-cover"
+                            className="object-contain md:object-cover"
                         />
                     </motion.div>
                 ))}
             </div>
 
             {/* Slider Dots */}
-            <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 sm:bottom-6">
+            <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 sm:bottom-6">
                 {heroBanners.map((_, index) => (
                     <button
                         key={index}
                         type="button"
                         aria-label={`Go to banner ${index + 1}`}
+                        aria-current={
+                            currentBanner === index ? "true" : undefined
+                        }
                         onClick={() => setCurrentBanner(index)}
                         className={`h-2 rounded-full transition-all duration-300 ${
                             currentBanner === index

@@ -5,9 +5,9 @@ import ReduxProvider from "@/components/ReduxProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-    title: "Dermiscaa | Pure Care. Everyday Confidence.",
+    title: "Dermisca | Pure Care. Everyday Confidence.",
     description:
-        "Dermiscaa skincare and haircare products for your everyday beauty routine.",
+        "Dermisca skincare and haircare products for your everyday beauty routine.",
 };
 
 export default function RootLayout({
@@ -20,9 +20,7 @@ export default function RootLayout({
             <body>
                 <ReduxProvider>
                     <Navbar />
-
-                    <main className="pt-16">{children}</main>
-
+                    <main>{children}</main>
                     <Footer />
                 </ReduxProvider>
             </body>

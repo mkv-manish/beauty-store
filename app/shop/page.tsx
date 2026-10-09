@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
 import { FiSearch, FiSliders, FiX } from "react-icons/fi";
@@ -18,7 +18,7 @@ type Product = {
     stock: number;
 };
 
-function ShopContent() {
+export default function ShopPage() {
     const searchParams = useSearchParams();
 
     const [products, setProducts] = useState<Product[]>([]);
@@ -29,7 +29,6 @@ function ShopContent() {
     const [category, setCategory] = useState("all");
     const [sort, setSort] = useState("default");
 
-    // Get category from URL
     useEffect(() => {
         const categoryFromUrl = searchParams.get("category");
 
@@ -40,7 +39,6 @@ function ShopContent() {
         }
     }, [searchParams]);
 
-    // Fetch products
     useEffect(() => {
         async function getProducts() {
             try {
@@ -66,7 +64,6 @@ function ShopContent() {
         getProducts();
     }, []);
 
-    // Filter and sort products
     const filteredProducts = useMemo(() => {
         let result = [...products];
 
@@ -96,7 +93,6 @@ function ShopContent() {
         return result;
     }, [products, search, category, sort]);
 
-    // Clear filters
     function clearFilters() {
         setSearch("");
         setCategory("all");
@@ -114,7 +110,7 @@ function ShopContent() {
                         transition={{ duration: 0.5 }}
                     >
                         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7B8A74]">
-                            Dermiscaa Collection
+                            Dermisca Collection
                         </p>
 
                         <h1 className="mt-2 text-4xl font-bold tracking-tight text-[#26352B] sm:text-5xl">
@@ -178,9 +174,7 @@ function ShopContent() {
                                     className="w-full rounded-xl border border-[#E7E2DA] bg-[#FBF8F3] px-4 py-3 text-sm text-[#26352B] outline-none focus:border-[#7B8A74] sm:w-auto"
                                 >
                                     <option value="all">All Categories</option>
-
                                     <option value="skin">Skin Care</option>
-
                                     <option value="hair">Hair Care</option>
                                 </select>
                             </div>
@@ -194,9 +188,7 @@ function ShopContent() {
                                 className="rounded-xl border border-[#E7E2DA] bg-[#FBF8F3] px-4 py-3 text-sm text-[#26352B] outline-none focus:border-[#7B8A74]"
                             >
                                 <option value="default">Sort by</option>
-
                                 <option value="low">Price: Low to High</option>
-
                                 <option value="high">Price: High to Low</option>
                             </select>
                         </div>
@@ -254,11 +246,8 @@ function ShopContent() {
 
                                 <div className="space-y-3 p-4">
                                     <div className="h-3 w-20 animate-pulse rounded bg-[#EDE8E0]" />
-
                                     <div className="h-5 w-3/4 animate-pulse rounded bg-[#EDE8E0]" />
-
                                     <div className="h-5 w-16 animate-pulse rounded bg-[#EDE8E0]" />
-
                                     <div className="h-10 animate-pulse rounded-xl bg-[#EDE8E0]" />
                                 </div>
                             </div>
@@ -299,7 +288,7 @@ function ShopContent() {
                         </div>
 
                         <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
-                            {filteredProducts.map((product) => (
+                            {filteredProducts.map((product, index) => (
                                 <ProductCard
                                     key={product._id}
                                     product={product}
@@ -310,51 +299,5 @@ function ShopContent() {
                 )}
             </section>
         </main>
-    );
-}
-
-/* Suspense fallback */
-function ShopLoading() {
-    return (
-        <main className="min-h-screen bg-[#FBF8F3] px-4 py-16 sm:px-6 sm:py-20">
-            <div className="mx-auto max-w-7xl">
-                <div className="mb-8">
-                    <div className="h-4 w-40 animate-pulse rounded bg-[#E7E2DA]" />
-
-                    <div className="mt-3 h-10 w-32 animate-pulse rounded bg-[#E7E2DA]" />
-
-                    <div className="mt-4 h-5 w-full max-w-xl animate-pulse rounded bg-[#EDE8E0]" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
-                    {Array.from({ length: 8 }).map((_, index) => (
-                        <div
-                            key={index}
-                            className="overflow-hidden rounded-2xl border border-[#E7E2DA] bg-white"
-                        >
-                            <div className="aspect-square animate-pulse bg-[#EDE8E0]" />
-
-                            <div className="space-y-3 p-4">
-                                <div className="h-3 w-20 animate-pulse rounded bg-[#EDE8E0]" />
-
-                                <div className="h-5 w-3/4 animate-pulse rounded bg-[#EDE8E0]" />
-
-                                <div className="h-5 w-16 animate-pulse rounded bg-[#EDE8E0]" />
-
-                                <div className="h-10 animate-pulse rounded-xl bg-[#EDE8E0]" />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </main>
-    );
-}
-
-export default function ShopPage() {
-    return (
-        <Suspense fallback={<ShopLoading />}>
-            <ShopContent />
-        </Suspense>
     );
 }
