@@ -1,54 +1,67 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import { createToken } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
-    await connectDB();
-
     const body = await request.json();
+    const { name, email, phone, password } = body;
 
-    const { name, email, password } = body;
-
-    if (!name || !email || !password) {
+    if (
+      typeof name !== "string" ||
+      !name.trim() ||
+      typeof email !== "string" ||
+      !email.trim() ||
+      typeof phone !== "string" ||
+      typeof password !== "string"
+    ) {
       return NextResponse.json(
-        {
-          message: "Name, email and password are required.",
-        },
+        { message: "Name, email, mobile number and password are required." },
+        { status: 400 }
+      );
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPhone = phone.trim();
+
+    if (!/^[6-9]\d{9}$/.test(normalizedPhone)) {
+      return NextResponse.json(
+        { message: "Enter a valid 10-digit Indian mobile number." },
         { status: 400 }
       );
     }
 
     if (password.length < 6) {
       return NextResponse.json(
-        {
-          message: "Password must be at least 6 characters.",
-        },
+        { message: "Password must be at least 6 characters." },
         { status: 400 }
       );
     }
 
+    await connectDB();
+
     const existingUser = await User.findOne({
-      email: email.toLowerCase(),
+      $or: [
+        { email: normalizedEmail },
+        { phone: normalizedPhone },
+      ],
     });
 
     if (existingUser) {
       return NextResponse.json(
-        {
-          message: "User already exists.",
-        },
-        { status: 400 }
+        { message: "Email or mobile number is already registered." },
+        { status: 409 }
       );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      name,
-      email: email.toLowerCase(),
+      name: name.trim(),
+      email: normalizedEmail,
+      phone: normalizedPhone,
       password: hashedPassword,
     });
 
@@ -62,15 +75,14 @@ export async function POST(request: Request) {
           id: user._id,
           name: user.name,
           email: user.email,
+          phone: user.phone,
         },
       },
       { status: 201 }
     );
   } catch {
     return NextResponse.json(
-      {
-        message: "Registration failed.",
-      },
+      { message: "Registration failed." },
       { status: 500 }
     );
   }
