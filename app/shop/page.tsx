@@ -1,39 +1,37 @@
 import { Suspense } from "react";
 import ShopContent from "./ShopContent";
 
+function ShopLoading() {
+    return (
+        <main className="min-h-screen bg-[#FBF8F3] px-4 py-10 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl animate-pulse">
+                <div className="h-4 w-36 rounded bg-[#E7E2DA]" />
+                <div className="mt-5 h-10 max-w-sm rounded bg-[#E7E2DA]" />
+                <div className="mt-3 h-4 max-w-lg rounded bg-[#E7E2DA]" />
+
+                <div className="mt-9 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+                    {Array.from({ length: 8 }).map((_, index) => (
+                        <div
+                            key={index}
+                            className="overflow-hidden rounded-2xl border border-[#E7E2DA] bg-white"
+                        >
+                            <div className="aspect-square bg-[#EDE9E1]" />
+                            <div className="space-y-3 p-3 sm:p-4">
+                                <div className="h-4 rounded bg-[#EDE9E1]" />
+                                <div className="h-4 w-1/3 rounded bg-[#EDE9E1]" />
+                                <div className="h-9 rounded-full bg-[#EDE9E1]" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </main>
+    );
+}
+
 export default function ShopPage() {
     return (
-        <Suspense
-            fallback={
-                <main className="min-h-screen bg-[#FBF8F3]">
-                    <section className="border-b border-[#E7E2DA] bg-white">
-                        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-                            <div className="h-3 w-40 animate-pulse rounded bg-[#EDE8E0]" />
-                            <div className="mt-4 h-10 w-48 animate-pulse rounded bg-[#EDE8E0]" />
-                            <div className="mt-4 h-4 max-w-lg animate-pulse rounded bg-[#EDE8E0]" />
-                        </div>
-                    </section>
-
-                    <section className="mx-auto grid max-w-7xl grid-cols-2 gap-3 px-4 py-10 sm:gap-5 sm:px-6 lg:grid-cols-4 lg:gap-6 lg:px-8">
-                        {Array.from({ length: 8 }).map((_, index) => (
-                            <div
-                                key={index}
-                                className="overflow-hidden rounded-2xl border border-[#E7E2DA] bg-white"
-                            >
-                                <div className="aspect-square animate-pulse bg-[#EDE8E0]" />
-
-                                <div className="space-y-3 p-4">
-                                    <div className="h-3 w-20 animate-pulse rounded bg-[#EDE8E0]" />
-                                    <div className="h-5 w-3/4 animate-pulse rounded bg-[#EDE8E0]" />
-                                    <div className="h-5 w-16 animate-pulse rounded bg-[#EDE8E0]" />
-                                    <div className="h-10 animate-pulse rounded-xl bg-[#EDE8E0]" />
-                                </div>
-                            </div>
-                        ))}
-                    </section>
-                </main>
-            }
-        >
+        <Suspense fallback={<ShopLoading />}>
             <ShopContent />
         </Suspense>
     );

@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { motion } from "motion/react";
-import { FiSearch, FiSliders, FiX } from "react-icons/fi";
+import Link from "next/link";
+import { FiArrowLeft, FiSearch } from "react-icons/fi";
 import ProductCard from "@/components/ProductCard";
 
 type Product = {
@@ -24,24 +24,17 @@ export default function ShopContent() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [search, setSearch] = useState("");
-    const [category, setCategory] = useState("all");
-    const [sort, setSort] = useState("default");
 
-    // Get category from URL
+    const search = (searchParams.get("search") ?? "").trim();
+    const requestedCategory = searchParams.get("category");
+
+    const category =
+        requestedCategory === "skin" || requestedCategory === "hair"
+            ? requestedCategory
+            : "all";
+
     useEffect(() => {
-        const categoryFromUrl = searchParams.get("category");
-
-        if (categoryFromUrl === "skin" || categoryFromUrl === "hair") {
-            setCategory(categoryFromUrl);
-        } else {
-            setCategory("all");
-        }
-    }, [searchParams]);
-
-    // Fetch products
-    useEffect(() => {
-        async function getProducts() {
+        async function fetchProducts() {
             try {
                 setLoading(true);
                 setError("");
@@ -49,265 +42,153 @@ export default function ShopContent() {
                 const response = await fetch("/api/products");
 
                 if (!response.ok) {
-                    throw new Error("Failed to fetch products");
+                    throw new Error("Unable to load products.");
                 }
 
                 const data = await response.json();
 
                 if (!Array.isArray(data)) {
-                    throw new Error("Invalid products response");
+                    throw new Error("Invalid product data.");
                 }
 
                 setProducts(data);
             } catch {
-                setError("Unable to load products.");
+                setError(
+                    "Products load nahi ho paaye. Please refresh karke try karein.",
+                );
             } finally {
                 setLoading(false);
             }
         }
 
-        getProducts();
+        fetchProducts();
     }, []);
 
-    // Filter and sort products
     const filteredProducts = useMemo(() => {
-        let result = [...products];
+        const query = search.toLowerCase();
 
-        // Search
-        if (search.trim()) {
-            const searchText = search.trim().toLowerCase();
+        return products.filter((product) => {
+            const matchesSearch =
+                !query ||
+                product.name.toLowerCase().includes(query) ||
+                product.description?.toLowerCase().includes(query) ||
+                product.category.toLowerCase().includes(query);
 
-            result = result.filter((product) =>
-                product.name.toLowerCase().includes(searchText),
-            );
-        }
+            const matchesCategory =
+                category === "all" || product.category === category;
 
-        // Category
-        if (category !== "all") {
-            result = result.filter((product) => product.category === category);
-        }
+            return matchesSearch && matchesCategory;
+        });
+    }, [products, search, category]);
 
-        // Sort
-        if (sort === "low") {
-            result.sort((a, b) => a.price - b.price);
-        }
+    let heading = "For You";
+    let description =
+        "Explore everyday essentials for your skincare and haircare routine.";
 
-        if (sort === "high") {
-            result.sort((a, b) => b.price - a.price);
-        }
-
-        return result;
-    }, [products, search, category, sort]);
-
-    // Clear filters
-    function clearFilters() {
-        setSearch("");
-        setCategory("all");
-        setSort("default");
+    if (search) {
+        heading = `Results for "${search}"`;
+        description = `${filteredProducts.length} matching product${
+            filteredProducts.length === 1 ? "" : "s"
+        } found.`;
+    } else if (category === "skin") {
+        heading = "Skin Care";
+        description =
+            "Find the right essentials for your everyday skincare routine.";
+    } else if (category === "hair") {
+        heading = "Hair Care";
+        description = "Discover essentials for your everyday haircare routine.";
     }
 
     return (
         <main className="min-h-screen bg-[#FBF8F3]">
-            {/* Header */}
             <section className="border-b border-[#E7E2DA] bg-white">
-                <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
+                <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+                    <Link
+                        href="/"
+                        className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-[#687169] transition hover:text-[#26352B]"
                     >
-                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7B8A74]">
-                            Dermisca Collection
-                        </p>
+                        <FiArrowLeft size={16} />
+                        Back to home
+                    </Link>
 
-                        <h1 className="mt-2 text-4xl font-bold tracking-tight text-[#26352B] sm:text-5xl">
-                            Shop
-                        </h1>
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#7B8A74] sm:text-sm">
+                        Dermiscaa Collection
+                    </p>
 
-                        <p className="mt-4 max-w-2xl text-sm leading-6 text-[#687169] sm:text-base">
-                            Explore our skincare and haircare essentials made
-                            for your everyday routine.
-                        </p>
-                    </motion.div>
+                    <h1 className="break-words text-3xl font-semibold tracking-tight text-[#26352B] sm:text-4xl lg:text-5xl">
+                        {heading}
+                    </h1>
+
+                    <p className="mt-3 max-w-2xl text-sm leading-6 text-[#687169] sm:text-base">
+                        {description}
+                    </p>
                 </div>
             </section>
 
-            {/* Filters */}
-            <section className="border-b border-[#E7E2DA] bg-white">
-                <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                        {/* Search */}
-                        <div className="relative w-full lg:max-w-md">
-                            <FiSearch
-                                size={18}
-                                className="absolute left-4 top-1/2 -translate-y-1/2 text-[#687169]"
-                            />
+            <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+                {!loading && !error && filteredProducts.length > 0 && (
+                    <p className="mb-5 text-sm text-[#687169]">
+                        Showing {filteredProducts.length}{" "}
+                        {filteredProducts.length === 1 ? "product" : "products"}
+                    </p>
+                )}
 
-                            <input
-                                type="text"
-                                value={search}
-                                onChange={(event) =>
-                                    setSearch(event.target.value)
-                                }
-                                placeholder="Search products..."
-                                aria-label="Search products"
-                                className="w-full rounded-xl border border-[#E7E2DA] bg-[#FBF8F3] py-3 pl-11 pr-10 text-sm text-[#26352B] outline-none transition placeholder:text-[#92998F] focus:border-[#7B8A74] focus:ring-2 focus:ring-[#7B8A74]/10"
-                            />
-
-                            {search && (
-                                <button
-                                    type="button"
-                                    onClick={() => setSearch("")}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#687169] transition hover:bg-[#E7E2DA]"
-                                    aria-label="Clear search"
-                                >
-                                    <FiX size={16} />
-                                </button>
-                            )}
-                        </div>
-
-                        <div className="flex flex-col gap-3 sm:flex-row">
-                            {/* Category */}
-                            <div className="flex items-center gap-2">
-                                <FiSliders
-                                    size={16}
-                                    className="hidden text-[#687169] sm:block"
-                                />
-
-                                <select
-                                    value={category}
-                                    onChange={(event) =>
-                                        setCategory(event.target.value)
-                                    }
-                                    aria-label="Filter by category"
-                                    className="w-full cursor-pointer rounded-xl border border-[#E7E2DA] bg-[#FBF8F3] px-4 py-3 text-sm text-[#26352B] outline-none transition focus:border-[#7B8A74] focus:ring-2 focus:ring-[#7B8A74]/10 sm:w-auto"
-                                >
-                                    <option value="all">All Categories</option>
-                                    <option value="skin">Skin Care</option>
-                                    <option value="hair">Hair Care</option>
-                                </select>
-                            </div>
-
-                            {/* Sort */}
-                            <select
-                                value={sort}
-                                onChange={(event) =>
-                                    setSort(event.target.value)
-                                }
-                                aria-label="Sort products by price"
-                                className="w-full cursor-pointer rounded-xl border border-[#E7E2DA] bg-[#FBF8F3] px-4 py-3 text-sm text-[#26352B] outline-none transition focus:border-[#7B8A74] focus:ring-2 focus:ring-[#7B8A74]/10 sm:w-auto"
-                            >
-                                <option value="default">Sort by</option>
-                                <option value="low">Price: Low to High</option>
-                                <option value="high">Price: High to Low</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    {/* Active Filters */}
-                    {(search || category !== "all" || sort !== "default") && (
-                        <div className="mt-4 flex flex-wrap items-center gap-2">
-                            <span className="text-xs text-[#687169]">
-                                Active filters:
-                            </span>
-
-                            {search && (
-                                <span className="max-w-full break-words rounded-full bg-[#EFDCD6] px-3 py-1 text-xs font-medium text-[#26352B]">
-                                    Search: {search}
-                                </span>
-                            )}
-
-                            {category !== "all" && (
-                                <span className="rounded-full bg-[#DDE3D8] px-3 py-1 text-xs font-medium capitalize text-[#26352B]">
-                                    {category} care
-                                </span>
-                            )}
-
-                            {sort !== "default" && (
-                                <span className="rounded-full bg-[#E7E2DA] px-3 py-1 text-xs font-medium text-[#26352B]">
-                                    {sort === "low"
-                                        ? "Low to High"
-                                        : "High to Low"}
-                                </span>
-                            )}
-
-                            <button
-                                type="button"
-                                onClick={clearFilters}
-                                className="text-xs font-semibold text-[#7B8A74] transition hover:text-[#26352B]"
-                            >
-                                Clear all
-                            </button>
-                        </div>
-                    )}
-                </div>
-            </section>
-
-            {/* Products */}
-            <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
                 {loading ? (
-                    <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
                         {Array.from({ length: 8 }).map((_, index) => (
                             <div
                                 key={index}
-                                className="overflow-hidden rounded-2xl border border-[#E7E2DA] bg-white"
+                                className="animate-pulse overflow-hidden rounded-2xl border border-[#E7E2DA] bg-white"
                             >
-                                <div className="aspect-square animate-pulse bg-[#EDE8E0]" />
-
-                                <div className="space-y-3 p-4">
-                                    <div className="h-3 w-20 animate-pulse rounded bg-[#EDE8E0]" />
-                                    <div className="h-5 w-3/4 animate-pulse rounded bg-[#EDE8E0]" />
-                                    <div className="h-5 w-16 animate-pulse rounded bg-[#EDE8E0]" />
-                                    <div className="h-10 animate-pulse rounded-xl bg-[#EDE8E0]" />
+                                <div className="aspect-square bg-[#EDE9E1]" />
+                                <div className="space-y-3 p-3 sm:p-4">
+                                    <div className="h-4 rounded bg-[#EDE9E1]" />
+                                    <div className="h-4 w-1/3 rounded bg-[#EDE9E1]" />
+                                    <div className="h-9 rounded-full bg-[#EDE9E1]" />
                                 </div>
                             </div>
                         ))}
                     </div>
                 ) : error ? (
-                    <div className="rounded-2xl border border-[#E7E2DA] bg-white px-6 py-14 text-center">
-                        <p className="text-sm text-red-500">{error}</p>
+                    <div className="rounded-2xl border border-[#E7E2DA] bg-white px-5 py-12 text-center">
+                        <p className="text-[#687169]">{error}</p>
+                        <button
+                            type="button"
+                            onClick={() => window.location.reload()}
+                            className="mt-4 rounded-full bg-[#26352B] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#3C5141]"
+                        >
+                            Try again
+                        </button>
                     </div>
                 ) : filteredProducts.length === 0 ? (
-                    <div className="rounded-2xl border border-[#E7E2DA] bg-white px-6 py-14 text-center">
-                        <h2 className="text-xl font-semibold text-[#26352B]">
+                    <div className="rounded-2xl border border-[#E7E2DA] bg-white px-5 py-12 text-center sm:py-16">
+                        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#E7EBDD] text-[#52634F]">
+                            <FiSearch size={23} />
+                        </span>
+
+                        <h2 className="mt-4 text-xl font-semibold text-[#26352B]">
                             No products found
                         </h2>
 
-                        <p className="mt-2 text-sm text-[#687169]">
-                            Try changing your search or filters.
+                        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#687169]">
+                            {search
+                                ? "Try another product name, or explore our complete collection."
+                                : "There are no products in this category yet. Explore our complete collection instead."}
                         </p>
 
-                        <button
-                            type="button"
-                            onClick={clearFilters}
-                            className="mt-5 rounded-xl bg-[#7B8A74] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#687761] focus:outline-none focus:ring-2 focus:ring-[#7B8A74]/40 focus:ring-offset-2"
+                        <Link
+                            href="/shop"
+                            className="mt-6 inline-flex items-center justify-center rounded-full bg-[#26352B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#3C5141]"
                         >
-                            Clear Filters
-                        </button>
+                            Explore all products
+                        </Link>
                     </div>
                 ) : (
-                    <>
-                        <div className="mb-6 flex items-center justify-between">
-                            <p className="text-sm text-[#687169]">
-                                Showing{" "}
-                                <span className="font-semibold text-[#26352B]">
-                                    {filteredProducts.length}
-                                </span>{" "}
-                                {filteredProducts.length === 1
-                                    ? "product"
-                                    : "products"}
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
-                            {filteredProducts.map((product) => (
-                                <ProductCard
-                                    key={product._id}
-                                    product={product}
-                                />
-                            ))}
-                        </div>
-                    </>
+                    <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+                        {filteredProducts.map((product) => (
+                            <ProductCard key={product._id} product={product} />
+                        ))}
+                    </div>
                 )}
             </section>
         </main>

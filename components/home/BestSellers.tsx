@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { FiArrowRight } from "react-icons/fi";
+
 import ProductCard from "@/components/ProductCard";
 
 type Product = {
@@ -37,9 +38,13 @@ export default function BestSellers() {
 
                 const data = await response.json();
 
+                if (!Array.isArray(data)) {
+                    throw new Error("Invalid products response");
+                }
+
                 setProducts(data.slice(0, 4));
             } catch {
-                setError("Unable to load products.");
+                setError("Unable to load products. Please try again later.");
             } finally {
                 setLoading(false);
             }
@@ -51,7 +56,7 @@ export default function BestSellers() {
     return (
         <section className="bg-[#FBF8F3] px-4 py-14 sm:px-6 sm:py-20">
             <div className="mx-auto max-w-7xl">
-                {/* Heading */}
+                {/* Section heading */}
                 <div className="flex items-end justify-between gap-4">
                     <motion.div
                         initial={{ opacity: 0, y: 18 }}
@@ -77,7 +82,7 @@ export default function BestSellers() {
                     </Link>
                 </div>
 
-                {/* Loading */}
+                {/* Loading skeleton */}
                 {loading && (
                     <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
                         {[1, 2, 3, 4].map((item) => (
@@ -89,11 +94,8 @@ export default function BestSellers() {
 
                                 <div className="space-y-3 p-4">
                                     <div className="h-3 w-20 animate-pulse rounded bg-[#EDE8E0]" />
-
                                     <div className="h-5 w-3/4 animate-pulse rounded bg-[#EDE8E0]" />
-
                                     <div className="h-5 w-16 animate-pulse rounded bg-[#EDE8E0]" />
-
                                     <div className="h-10 animate-pulse rounded-xl bg-[#EDE8E0]" />
                                 </div>
                             </div>
@@ -101,14 +103,14 @@ export default function BestSellers() {
                     </div>
                 )}
 
-                {/* Error */}
+                {/* Error message */}
                 {!loading && error && (
                     <div className="mt-8 rounded-2xl border border-[#E7E2DA] bg-white px-6 py-10 text-center">
                         <p className="text-sm text-red-500">{error}</p>
                     </div>
                 )}
 
-                {/* Empty */}
+                {/* Empty state */}
                 {!loading && !error && products.length === 0 && (
                     <div className="mt-8 rounded-2xl border border-[#E7E2DA] bg-white px-6 py-10 text-center">
                         <p className="text-sm text-[#687169]">
@@ -120,7 +122,7 @@ export default function BestSellers() {
                 {/* Products */}
                 {!loading && !error && products.length > 0 && (
                     <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 lg:gap-6">
-                        {products.map((product, index) => (
+                        {products.map((product) => (
                             <ProductCard key={product._id} product={product} />
                         ))}
                     </div>

@@ -1,17 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "motion/react";
-import {
-    FiMenu,
-    FiX,
-    FiShoppingBag,
-    FiLogOut,
-    FiUser,
-    FiChevronRight,
-} from "react-icons/fi";
+import { FiMenu, FiX, FiShoppingBag, FiLogOut, FiUser } from "react-icons/fi";
+import SearchBar from "@/components/layout/SearchBar";
+import CategoryNav from "@/components/layout/CategoryNav";
 
 type User = {
     name: string;
@@ -54,13 +49,9 @@ export default function Navbar() {
             setAuthLoaded(true);
         }
 
-        // Load saved login state on initial render.
         loadUser();
 
-        // Update immediately after login, registration or logout.
         window.addEventListener("auth-change", loadUser);
-
-        // Sync changes made in another browser tab.
         window.addEventListener("storage", loadUser);
 
         return () => {
@@ -77,22 +68,6 @@ export default function Navbar() {
         };
     }, [menuOpen]);
 
-    useEffect(() => {
-        if (!menuOpen) return;
-
-        function handleEscape(event: KeyboardEvent) {
-            if (event.key === "Escape") {
-                setMenuOpen(false);
-            }
-        }
-
-        window.addEventListener("keydown", handleEscape);
-
-        return () => {
-            window.removeEventListener("keydown", handleEscape);
-        };
-    }, [menuOpen]);
-
     function closeMenu() {
         setMenuOpen(false);
     }
@@ -101,264 +76,202 @@ export default function Navbar() {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
 
-        // Notify Navbar and any other component listening for auth changes.
         window.dispatchEvent(new Event("auth-change"));
 
         setUser(null);
-        setMenuOpen(false);
+        closeMenu();
 
         router.replace("/");
         router.refresh();
     }
 
-    const linkClass =
-        "text-sm font-medium text-[#26352B] transition hover:text-[#7B8A74]";
-
-    const mobileLinkClass =
-        "flex min-h-[54px] items-center justify-between border-b border-[#EAE5DB] py-3 text-[15px] font-medium text-[#26352B] transition-colors hover:text-[#71806A]";
-
     return (
-        <header className="relative z-50 w-full border-b border-[#E7E2DA] bg-[#FBF8F3]">
-            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+        <header className="relative z-50 border-b border-[#E7E2DA] bg-white">
+            {/* Main header */}
+            <div className="mx-auto flex min-h-[72px] max-w-7xl items-center gap-3 px-4 py-3 sm:px-6 lg:gap-6 lg:px-8">
                 {/* Logo */}
                 <Link
                     href="/"
                     onClick={closeMenu}
+                    aria-label="Dermiscaa home"
                     className="flex shrink-0 items-center"
                 >
-                    <img
+                    <Image
                         src="/images/logo/logo.png"
-                        alt="Dermisca"
-                        className="h-[58px] w-auto object-contain"
+                        alt="Dermiscaa"
+                        width={160}
+                        height={60}
+                        priority
+                        className="h-11 w-auto object-contain sm:h-12"
                     />
                 </Link>
 
-                {/* Desktop navigation */}
-                <nav className="hidden items-center gap-6 lg:flex">
-                    <Link href="/" className={linkClass}>
-                        Home
-                    </Link>
+                {/* Search */}
+                <div className="min-w-0 flex-1">
+                    <SearchBar />
+                </div>
 
-                    <Link href="/shop" className={linkClass}>
-                        Shop
-                    </Link>
-
-                    <Link
-                        href="/cart"
-                        className={`flex items-center gap-2 ${linkClass}`}
-                    >
-                        <FiShoppingBag size={17} />
-                        Cart
-                    </Link>
-
-                    {authLoaded && user && (
-                        <Link href="/orders" className={linkClass}>
-                            My Orders
-                        </Link>
-                    )}
-
-                    {authLoaded && user && (
-                        <div className="flex items-center gap-2.5 border-l border-[#E7E2DA] pl-4">
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#E7EBDD] text-[#52634F]">
+                {/* Desktop account and cart */}
+                <div className="hidden shrink-0 items-center gap-4 lg:flex">
+                    {authLoaded && user ? (
+                        <div className="flex max-w-[155px] items-center gap-2">
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#E7EBDD] text-[#52634F]">
                                 <FiUser size={18} />
-                            </div>
+                            </span>
 
-                            <div className="max-w-[145px]">
+                            <div className="min-w-0">
                                 <p className="truncate text-sm font-semibold text-[#26352B]">
                                     {user.name}
                                 </p>
-                                <p className="truncate text-xs text-[#777D74]">
-                                    {user.email}
-                                </p>
+                                <button
+                                    type="button"
+                                    onClick={logout}
+                                    className="text-xs text-[#687169] transition hover:text-[#8C625D]"
+                                >
+                                    Logout
+                                </button>
                             </div>
                         </div>
-                    )}
-
-                    {authLoaded &&
-                        (user ? (
-                            <button
-                                type="button"
-                                onClick={logout}
-                                className="flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-[#8C625D] transition hover:bg-[#F1E8E2] hover:text-red-700"
-                            >
-                                <FiLogOut size={16} />
-                                Logout
-                            </button>
-                        ) : (
+                    ) : (
+                        authLoaded && (
                             <Link
                                 href="/login"
-                                className="rounded-full bg-[#7B8A74] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#687761]"
+                                className="rounded-lg bg-[#26352B] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#3C5141]"
                             >
                                 Login
                             </Link>
-                        ))}
-                </nav>
+                        )
+                    )}
 
-                {/* Mobile menu button */}
-                <button
-                    type="button"
-                    onClick={() => setMenuOpen((open) => !open)}
-                    aria-label={menuOpen ? "Close menu" : "Open menu"}
-                    aria-expanded={menuOpen}
-                    aria-controls="mobile-navigation"
-                    className="flex h-10 w-10 items-center justify-center rounded-full text-[#26352B] transition hover:bg-[#F0EDE5] lg:hidden"
-                >
-                    {menuOpen ? <FiX size={23} /> : <FiMenu size={23} />}
-                </button>
+                    <Link
+                        href="/cart"
+                        className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-[#26352B] transition hover:bg-[#F5F3ED]"
+                    >
+                        <FiShoppingBag size={21} />
+                        <span>Cart</span>
+                    </Link>
+                </div>
+
+                {/* Mobile actions */}
+                <div className="flex shrink-0 items-center gap-1 lg:hidden">
+                    <Link
+                        href="/cart"
+                        aria-label="Shopping cart"
+                        className="flex h-10 w-10 items-center justify-center rounded-full text-[#26352B] hover:bg-[#F5F3ED]"
+                    >
+                        <FiShoppingBag size={21} />
+                    </Link>
+
+                    <button
+                        type="button"
+                        onClick={() => setMenuOpen((open) => !open)}
+                        aria-label={menuOpen ? "Close menu" : "Open menu"}
+                        aria-expanded={menuOpen}
+                        className="flex h-10 w-10 items-center justify-center rounded-full text-[#26352B] hover:bg-[#F5F3ED]"
+                    >
+                        {menuOpen ? <FiX size={23} /> : <FiMenu size={23} />}
+                    </button>
+                </div>
             </div>
 
-            {/* Mobile drawer */}
-            <AnimatePresence>
-                {menuOpen && (
-                    <>
-                        <motion.button
-                            type="button"
-                            aria-label="Close navigation"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={closeMenu}
-                            className="fixed inset-0 z-[60] cursor-default bg-[#1D281F]/40 lg:hidden"
-                        />
+            {/* Category navigation */}
+            <Suspense
+                fallback={
+                    <div className="h-12 border-t border-[#E7E2DA] bg-white" />
+                }
+            >
+                <CategoryNav />
+            </Suspense>
 
-                        <motion.aside
-                            id="mobile-navigation"
-                            role="dialog"
-                            aria-modal="true"
-                            aria-label="Mobile navigation"
-                            initial={{ x: "100%" }}
-                            animate={{ x: 0 }}
-                            exit={{ x: "100%" }}
-                            transition={{
-                                type: "tween",
-                                duration: 0.28,
-                                ease: "easeOut",
-                            }}
-                            className="fixed right-0 top-0 z-[70] flex h-[100dvh] w-[min(86vw,360px)] flex-col overflow-y-auto bg-[#FBF8F3] shadow-2xl lg:hidden"
-                        >
-                            {/* Drawer header */}
-                            <div className="flex min-h-[72px] items-center justify-between border-b border-[#E7E2DA] px-5">
-                                <Link href="/" onClick={closeMenu}>
-                                    <img
-                                        src="/images/logo/logo.png"
-                                        alt="Dermisca"
-                                        className="h-[54px] w-auto object-contain"
-                                    />
-                                </Link>
+            {/* Mobile menu */}
+            {menuOpen && (
+                <div className="fixed inset-0 z-[100] bg-black/30 lg:hidden">
+                    <button
+                        type="button"
+                        aria-label="Close menu"
+                        onClick={closeMenu}
+                        className="absolute inset-0 h-full w-full cursor-default"
+                    />
 
-                                <button
-                                    type="button"
-                                    onClick={closeMenu}
-                                    aria-label="Close menu"
-                                    className="flex h-10 w-10 items-center justify-center rounded-full text-[#26352B] hover:bg-[#EEEAE1]"
-                                >
-                                    <FiX size={22} />
-                                </button>
-                            </div>
+                    <aside className="absolute right-0 top-0 flex h-full w-[min(85%,360px)] flex-col overflow-y-auto bg-[#FBF8F3] shadow-xl">
+                        <div className="flex items-center justify-between border-b border-[#E7E2DA] px-5 py-4">
+                            <Link href="/" onClick={closeMenu}>
+                                <Image
+                                    src="/images/logo/logo.png"
+                                    alt="Dermiscaa"
+                                    width={145}
+                                    height={55}
+                                    className="h-10 w-auto object-contain"
+                                />
+                            </Link>
 
-                            {/* Account information */}
-                            <div className="px-6 pb-5 pt-7">
-                                {authLoaded && user ? (
-                                    <>
-                                        <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-[#E7EBDD] text-[#52634F]">
-                                            <FiUser size={20} />
-                                        </div>
+                            <button
+                                type="button"
+                                onClick={closeMenu}
+                                aria-label="Close menu"
+                                className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-[#EEEAE1]"
+                            >
+                                <FiX size={22} />
+                            </button>
+                        </div>
 
-                                        <p className="mt-1 break-words text-xl font-semibold text-[#26352B]">
-                                            {user.name}
+                        <div className="border-b border-[#E7E2DA] px-5 py-6">
+                            {authLoaded && user ? (
+                                <>
+                                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#E7EBDD] text-[#52634F]">
+                                        <FiUser size={21} />
+                                    </div>
+                                    <p className="mt-3 text-lg font-semibold text-[#26352B]">
+                                        {user.name}
+                                    </p>
+                                    {user.email && (
+                                        <p className="mt-1 break-all text-sm text-[#687169]">
+                                            {user.email}
                                         </p>
+                                    )}
+                                </>
+                            ) : (
+                                <>
+                                    <p className="text-xl font-semibold text-[#26352B]">
+                                        Welcome to Dermiscaa
+                                    </p>
+                                    <p className="mt-2 text-sm text-[#687169]">
+                                        Pure care. Everyday confidence.
+                                    </p>
+                                </>
+                            )}
+                        </div>
 
-                                        {user.email && (
-                                            <p className="mt-1 break-all text-sm text-[#777D74]">
-                                                {user.email}
-                                            </p>
-                                        )}
-                                    </>
-                                ) : (
-                                    <>
-                                        <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7B8A74]">
-                                            DERMISCA
-                                        </p>
-
-                                        <h2 className="mt-2 text-2xl font-medium leading-snug tracking-tight text-[#26352B]">
-                                            A little care,
-                                            <br />
-                                            every day.
-                                        </h2>
-
-                                        <p className="mt-2 text-sm leading-6 text-[#777D74]">
-                                            Natural care for your skin and hair.
-                                        </p>
-                                    </>
-                                )}
-                            </div>
-
-                            {/* Mobile links */}
-                            <nav className="px-6">
+                        <nav className="px-5">
+                            {[
+                                { label: "Home", href: "/" },
+                                { label: "Shop all products", href: "/shop" },
+                                ...(user
+                                    ? [{ label: "My Orders", href: "/orders" }]
+                                    : []),
+                                { label: "Cart", href: "/cart" },
+                            ].map((item) => (
                                 <Link
-                                    href="/"
+                                    key={item.href}
+                                    href={item.href}
                                     onClick={closeMenu}
-                                    className={mobileLinkClass}
+                                    className="flex min-h-14 items-center justify-between border-b border-[#E7E2DA] text-sm font-medium text-[#26352B] transition hover:text-[#7B8A74]"
                                 >
-                                    Home
-                                    <FiChevronRight
-                                        size={18}
-                                        className="text-[#9AA08F]"
-                                    />
-                                </Link>
-
-                                <Link
-                                    href="/shop"
-                                    onClick={closeMenu}
-                                    className={mobileLinkClass}
-                                >
-                                    Shop all products
-                                    <FiChevronRight
-                                        size={18}
-                                        className="text-[#9AA08F]"
-                                    />
-                                </Link>
-
-                                <Link
-                                    href="/cart"
-                                    onClick={closeMenu}
-                                    className={mobileLinkClass}
-                                >
-                                    <span className="flex items-center gap-3">
-                                        <FiShoppingBag
-                                            size={19}
-                                            className="text-[#7B8A74]"
-                                        />
-                                        Cart
+                                    {item.label}
+                                    <span className="text-lg text-[#9AA08F]">
+                                        ›
                                     </span>
-                                    <FiChevronRight
-                                        size={18}
-                                        className="text-[#9AA08F]"
-                                    />
                                 </Link>
+                            ))}
+                        </nav>
 
-                                {authLoaded && user && (
-                                    <Link
-                                        href="/orders"
-                                        onClick={closeMenu}
-                                        className={mobileLinkClass}
-                                    >
-                                        My Orders
-                                        <FiChevronRight
-                                            size={18}
-                                            className="text-[#9AA08F]"
-                                        />
-                                    </Link>
-                                )}
-                            </nav>
-
-                            {/* Login / Logout */}
-                            <div className="mt-auto px-6 pb-8 pt-7">
-                                {authLoaded && user ? (
+                        <div className="mt-auto px-5 py-6">
+                            {authLoaded &&
+                                (user ? (
                                     <button
                                         type="button"
                                         onClick={logout}
-                                        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-[#DCD5C9] text-sm font-medium text-[#8C625D] transition hover:bg-[#F1E8E2]"
+                                        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-[#E7E2DA] text-sm font-semibold text-[#8C625D] transition hover:bg-[#F1E8E2]"
                                     >
                                         <FiLogOut size={17} />
                                         Logout
@@ -367,24 +280,15 @@ export default function Navbar() {
                                     <Link
                                         href="/login"
                                         onClick={closeMenu}
-                                        className="flex min-h-12 w-full items-center justify-center rounded-full bg-[#7B8A74] px-5 text-sm font-semibold text-white transition hover:bg-[#687761]"
+                                        className="flex min-h-12 w-full items-center justify-center rounded-xl bg-[#26352B] text-sm font-semibold text-white transition hover:bg-[#3C5141]"
                                     >
                                         Login / Sign up
-                                        <FiChevronRight
-                                            size={17}
-                                            className="ml-2"
-                                        />
                                     </Link>
-                                )}
-
-                                <p className="mt-5 text-center text-[10px] uppercase tracking-[0.18em] text-[#9A9B90]">
-                                    Thoughtful care, naturally.
-                                </p>
-                            </div>
-                        </motion.aside>
-                    </>
-                )}
-            </AnimatePresence>
+                                ))}
+                        </div>
+                    </aside>
+                </div>
+            )}
         </header>
     );
 }

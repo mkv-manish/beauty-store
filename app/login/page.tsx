@@ -63,7 +63,7 @@ export default function LoginPage() {
             window.dispatchEvent(new Event("auth-change"));
 
             // Navigate after successful login.
-            router.replace("/shop");
+            router.replace("/");
             router.refresh();
         } catch (error) {
             setError(error instanceof Error ? error.message : "Login failed.");
