@@ -1,9 +1,11 @@
 "use client";
 
+import { BagIcon as FiShoppingBag } from "@/components/ui/BeautyIcons";
+
 import Link from "next/link";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { FiCheck, FiShoppingBag } from "react-icons/fi";
+import { FiCheck } from "react-icons/fi";
 
 function SuccessContent() {
     const searchParams = useSearchParams();
@@ -14,12 +16,12 @@ function SuccessContent() {
             <div className="mx-auto max-w-lg">
                 <div className="rounded-3xl border border-[#E7E2DA] bg-white p-8 text-center shadow-sm sm:p-10">
                     {/* Success Icon */}
-                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#DDE3D8] text-[#7B8A74]">
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#DDE3D8] text-[#52634F]">
                         <FiCheck size={36} />
                     </div>
 
                     {/* Heading */}
-                    <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-[#7B8A74]">
+                    <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-[#52634F]">
                         Order Confirmed
                     </p>
 
@@ -58,7 +60,7 @@ function SuccessContent() {
                     <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                         <Link
                             href="/shop"
-                            className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#7B8A74] px-5 text-sm font-semibold text-white transition hover:bg-[#687761]"
+                            className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#52634F] px-5 text-sm font-semibold text-white transition hover:bg-[#3C5141]"
                         >
                             <FiShoppingBag size={17} />
                             Continue Shopping

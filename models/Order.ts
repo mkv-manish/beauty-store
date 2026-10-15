@@ -34,6 +34,8 @@ const orderItemSchema = new mongoose.Schema(
 
 const orderSchema = new mongoose.Schema(
   {
+    requestKey: { type: String },
+
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -60,6 +62,10 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
+    subtotal: Number,
+    discount: { type: Number, default: 0 },
+    discountCode: String,
+
     total: {
       type: Number,
       required: true,
@@ -81,6 +87,8 @@ const orderSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+orderSchema.index({ user: 1, requestKey: 1 }, { unique: true, partialFilterExpression: { requestKey: { $type: "string" } } });
 
 export default mongoose.models.Order ||
   mongoose.model("Order", orderSchema);

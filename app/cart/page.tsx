@@ -1,4 +1,8 @@
 "use client";
+import CartLoading from "@/components/cart/CartLoading";
+import { useCart } from "@/store/useCart";
+
+import { BagIcon as FiShoppingBag } from "@/components/ui/BeautyIcons";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -7,22 +11,22 @@ import {
     FiArrowRight,
     FiMinus,
     FiPlus,
-    FiShoppingBag,
     FiTrash2,
 } from "react-icons/fi";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { removeFromCart, updateQuantity } from "@/store/cartSlice";
-import type { RootState } from "@/store/store";
 
 export default function CartPage() {
     const dispatch = useDispatch();
 
-    const items = useSelector((state: RootState) => state.cart.items);
+    const { items, hydrated } = useCart();
 
     const total = items.reduce(
         (sum, item) => sum + item.price * item.quantity,
         0,
     );
+
+    if (!hydrated) return <CartLoading />;
 
     if (items.length === 0) {
         return (
@@ -32,7 +36,7 @@ export default function CartPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="mx-auto max-w-md text-center"
                 >
-                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#EFDCD6] text-[#7B8A74]">
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#EFDCD6] text-[#52634F]">
                         <FiShoppingBag size={30} />
                     </div>
 
@@ -46,7 +50,7 @@ export default function CartPage() {
 
                     <Link
                         href="/shop"
-                        className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#7B8A74] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#687761]"
+                        className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#52634F] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#3C5141]"
                     >
                         Continue Shopping
                         <FiArrowRight size={16} />
@@ -64,7 +68,7 @@ export default function CartPage() {
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                 >
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7B8A74]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#52634F]">
                         Your Selection
                     </p>
 
@@ -77,7 +81,7 @@ export default function CartPage() {
                     </p>
                 </motion.div>
 
-                <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_350px]">
+                <div className="mt-8 grid gap-6 md:grid-cols-[minmax(0,1fr)_280px] lg:grid-cols-[minmax(0,1fr)_350px]">
                     {/* Items */}
                     <div className="space-y-3">
                         {items.map((item, index) => (
@@ -122,19 +126,19 @@ export default function CartPage() {
                                                         ),
                                                     )
                                                 }
-                                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#8C625D] transition hover:bg-[#F8ECE9]"
+                                                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#8C625D] transition hover:bg-[#F8ECE9]"
                                                 aria-label={`Remove ${item.name}`}
                                             >
                                                 <FiTrash2 size={16} />
                                             </button>
                                         </div>
 
-                                        <p className="mt-2 text-xs text-[#687169]">
-                                            {item.stock} available
+                                        <p className="stock-label mt-2">
+                                            <span className="stock-dot" /> In stock · {item.stock} available
                                         </p>
 
                                         {/* Quantity */}
-                                        <div className="mt-4 flex items-center justify-between gap-3">
+                                        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                                             <div className="flex items-center overflow-hidden rounded-lg border border-[#DDD7CE]">
                                                 <button
                                                     type="button"
@@ -148,15 +152,16 @@ export default function CartPage() {
                                                             }),
                                                         )
                                                     }
+                                                    aria-label={`Decrease quantity of ${item.name}`}
                                                     disabled={
                                                         item.quantity <= 1
                                                     }
-                                                    className="flex h-8 w-8 items-center justify-center text-[#26352B] hover:bg-[#F4EEE7] disabled:opacity-40"
+                                                    className="flex h-11 w-11 items-center justify-center text-[#26352B] hover:bg-[#F4EEE7] disabled:opacity-40"
                                                 >
                                                     <FiMinus size={13} />
                                                 </button>
 
-                                                <span className="flex h-8 min-w-9 items-center justify-center border-x border-[#DDD7CE] text-xs font-semibold text-[#26352B]">
+                                                <span className="flex h-11 min-w-9 items-center justify-center border-x border-[#DDD7CE] text-xs font-semibold text-[#26352B]">
                                                     {item.quantity}
                                                 </span>
 
@@ -172,11 +177,12 @@ export default function CartPage() {
                                                             }),
                                                         )
                                                     }
+                                                    aria-label={`Increase quantity of ${item.name}`}
                                                     disabled={
                                                         item.quantity >=
                                                         item.stock
                                                     }
-                                                    className="flex h-8 w-8 items-center justify-center text-[#26352B] hover:bg-[#F4EEE7] disabled:opacity-40"
+                                                    className="flex h-11 w-11 items-center justify-center text-[#26352B] hover:bg-[#F4EEE7] disabled:opacity-40"
                                                 >
                                                     <FiPlus size={13} />
                                                 </button>
@@ -196,7 +202,7 @@ export default function CartPage() {
                     <motion.div
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="h-fit rounded-2xl border border-[#E7E2DA] bg-white p-5 sm:p-6 lg:sticky lg:top-24"
+                        className="h-fit rounded-2xl border border-[#E7E2DA] bg-white p-5 sm:p-6 lg:sticky lg:top-44"
                     >
                         <h2 className="text-lg font-bold text-[#26352B]">
                             Order Summary
@@ -226,7 +232,7 @@ export default function CartPage() {
 
                         <Link
                             href="/checkout"
-                            className="mt-6 flex h-12 items-center justify-center gap-2 rounded-xl bg-[#7B8A74] text-sm font-semibold text-white transition hover:bg-[#687761]"
+                            className="mt-6 flex h-12 items-center justify-center gap-2 rounded-xl bg-[#52634F] text-sm font-semibold text-white transition hover:bg-[#3C5141]"
                         >
                             Proceed to Checkout
                             <FiArrowRight size={17} />

@@ -1,5 +1,8 @@
 "use client";
+import CartLoading from "@/components/cart/CartLoading";
+import { useCart } from "@/store/useCart";
 
+import DiscountCode from "@/components/checkout/DiscountCode";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -11,21 +14,21 @@ import {
     FiPhone,
     FiUser,
 } from "react-icons/fi";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { clearCart } from "@/store/cartSlice";
-import type { RootState } from "@/store/store";
 
 export default function CheckoutPage() {
     const router = useRouter();
     const dispatch = useDispatch();
 
-    const items = useSelector((state: RootState) => state.cart.items);
+    const { items, hydrated } = useCart();
 
     const total = items.reduce(
         (sum, item) => sum + item.price * item.quantity,
         0,
     );
 
+    const [discountCode, setDiscountCode] = useState("");
     const [name, setName] = useState("");
     const [phone, setPhone] = useState("");
     const [address, setAddress] = useState("");
@@ -38,13 +41,6 @@ export default function CheckoutPage() {
 
         setError("");
 
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-            router.push("/login");
-            return;
-        }
-
         if (items.length === 0) {
             setError("Your cart is empty.");
             return;
@@ -53,17 +49,23 @@ export default function CheckoutPage() {
         try {
             setLoading(true);
 
+            const signature = JSON.stringify({ name, phone, address, discountCode, items: items.map(item => ({ product: item._id, quantity: item.quantity })) });
+            let pending: { signature: string; key: string } | null = null;
+            try { pending = JSON.parse(sessionStorage.getItem("pending-order") ?? "null"); } catch { /* Replace malformed saved request. */ }
+            const requestKey = pending?.signature === signature ? pending.key : crypto.randomUUID();
+            sessionStorage.setItem("pending-order", JSON.stringify({ signature, key: requestKey }));
             const response = await fetch("/api/orders", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
+                    "Idempotency-Key": requestKey,
                 },
                 body: JSON.stringify({
                     name,
                     phone,
                     address,
                     paymentMethod: "COD",
+                    discountCode,
 
                     items: items.map((item) => ({
                         product: item._id,
@@ -74,11 +76,13 @@ export default function CheckoutPage() {
 
             const data = await response.json();
 
+            if (response.status === 401) { router.push("/login?next=/checkout"); return; }
             if (!response.ok) {
                 throw new Error(data.message || "Unable to place order.");
             }
 
             // Clear cart only after successful order
+            sessionStorage.removeItem("pending-order");
             dispatch(clearCart());
 
             router.push(`/checkout/success?orderId=${data.order._id}`);
@@ -93,11 +97,13 @@ export default function CheckoutPage() {
         }
     }
 
+    if (!hydrated) return <CartLoading />;
+
     if (items.length === 0) {
         return (
             <main className="min-h-[70vh] bg-[#FBF8F3] px-4 py-20">
                 <div className="mx-auto max-w-md rounded-3xl border border-[#E7E2DA] bg-white p-8 text-center sm:p-10">
-                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#EFDCD6] text-[#7B8A74]">
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#EFDCD6] text-[#52634F]">
                         <FiCheck size={26} />
                     </div>
 
@@ -111,7 +117,7 @@ export default function CheckoutPage() {
 
                     <Link
                         href="/shop"
-                        className="mt-6 inline-flex rounded-full bg-[#7B8A74] px-6 py-3 text-sm font-semibold text-white"
+                        className="mt-6 inline-flex rounded-full bg-[#52634F] px-6 py-3 text-sm font-semibold text-white"
                     >
                         Go to Shop
                     </Link>
@@ -136,7 +142,7 @@ export default function CheckoutPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="mt-6"
                 >
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7B8A74]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#52634F]">
                         Almost There
                     </p>
 
@@ -149,7 +155,7 @@ export default function CheckoutPage() {
                     </p>
                 </motion.div>
 
-                <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_350px]">
+                <div className="mt-8 grid gap-6 md:grid-cols-[minmax(0,1fr)_300px] lg:grid-cols-[minmax(0,1fr)_350px]">
                     {/* Form */}
                     <motion.form
                         initial={{ opacity: 0, y: 15 }}
@@ -174,11 +180,12 @@ export default function CheckoutPage() {
                                 <div className="relative">
                                     <FiUser
                                         size={17}
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7B8A74]"
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[#52634F]"
                                     />
 
                                     <input
                                         id="name"
+                                        autoComplete="name"
                                         type="text"
                                         required
                                         value={name}
@@ -202,12 +209,16 @@ export default function CheckoutPage() {
                                 <div className="relative">
                                     <FiPhone
                                         size={17}
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7B8A74]"
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[#52634F]"
                                     />
 
                                     <input
                                         id="phone"
                                         type="tel"
+                                        autoComplete="tel-national"
+                                        inputMode="numeric"
+                                        pattern="[6-9][0-9]{9}"
+                                        maxLength={10}
                                         required
                                         value={phone}
                                         onChange={(event) =>
@@ -230,11 +241,12 @@ export default function CheckoutPage() {
                                 <div className="relative">
                                     <FiMapPin
                                         size={17}
-                                        className="absolute left-4 top-4 text-[#7B8A74]"
+                                        className="absolute left-4 top-4 text-[#52634F]"
                                     />
 
                                     <textarea
                                         id="address"
+                                        autoComplete="street-address"
                                         required
                                         value={address}
                                         onChange={(event) =>
@@ -257,7 +269,7 @@ export default function CheckoutPage() {
                             <div className="mt-4 rounded-xl border border-[#7B8A74] bg-[#F7F6F1] p-4">
                                 <div className="flex items-start gap-3">
                                     <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#7B8A74]">
-                                        <div className="h-2.5 w-2.5 rounded-full bg-[#7B8A74]" />
+                                        <div className="h-2.5 w-2.5 rounded-full bg-[#52634F]" />
                                     </div>
 
                                     <div>
@@ -274,7 +286,7 @@ export default function CheckoutPage() {
                         </div>
 
                         {error && (
-                            <div className="mt-5 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-600">
+                            <div role="alert" className="mt-5 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-600">
                                 {error}
                             </div>
                         )}
@@ -282,7 +294,7 @@ export default function CheckoutPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="mt-7 flex h-12 w-full items-center justify-center rounded-xl bg-[#7B8A74] text-sm font-semibold text-white transition hover:bg-[#687761] disabled:cursor-not-allowed disabled:opacity-60"
+                            className="mt-7 flex h-12 w-full items-center justify-center rounded-xl bg-[#52634F] text-sm font-semibold text-white transition hover:bg-[#3C5141] disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             {loading ? "Placing Order..." : "Place Order"}
                         </button>
@@ -293,7 +305,7 @@ export default function CheckoutPage() {
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="h-fit rounded-2xl border border-[#E7E2DA] bg-white p-5 sm:p-7 lg:sticky lg:top-24"
+                        className="h-fit rounded-2xl border border-[#E7E2DA] bg-white p-5 sm:p-7 lg:sticky lg:top-44"
                     >
                         <h2 className="text-lg font-bold text-[#26352B]">
                             Order Summary
@@ -326,7 +338,7 @@ export default function CheckoutPage() {
 
                         <div className="flex items-center justify-between">
                             <span className="font-semibold text-[#26352B]">
-                                Total
+                                Estimated subtotal
                             </span>
 
                             <span className="text-xl font-bold text-[#26352B]">
@@ -334,9 +346,9 @@ export default function CheckoutPage() {
                             </span>
                         </div>
 
+                        <DiscountCode items={items} onCode={setDiscountCode} />
                         <p className="mt-3 text-xs leading-5 text-[#687169]">
-                            Final order total is calculated securely from the
-                            product prices stored in the database.
+                            Pay on delivery. Prices and availability are confirmed when you place your order.
                         </p>
                     </motion.div>
                 </div>

@@ -1,0 +1,3 @@
+export default function CartLoading() {
+  return <main className="min-h-[65vh] bg-[#FBF8F3] px-4 py-10 sm:px-6"><div className="mx-auto max-w-6xl" role="status" aria-label="Loading your saved cart"><span className="sr-only">Loading your saved cart…</span><div className="mb-8 h-10 w-48 animate-pulse rounded-xl bg-[#E7E2DA]" /><div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_280px]"><div className="space-y-4"><div className="h-36 animate-pulse rounded-2xl bg-[#EDE8E0]" /><div className="h-36 animate-pulse rounded-2xl bg-[#EDE8E0]" /></div><div className="h-64 animate-pulse rounded-2xl bg-[#EDE8E0]" /></div></div></main>;
+}

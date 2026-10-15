@@ -10,19 +10,22 @@ type CartItem = {
 };
 
 type CartState = {
+  hydrated: boolean;
   items: CartItem[];
 };
 
-const initialState: CartState = {
+export const initialCartState: CartState = {
+  hydrated: false,
   items: [],
 };
 
 const cartSlice = createSlice({
   name: "cart",
-  initialState,
+  initialState: initialCartState,
 
   reducers: {
     addToCart: (state, action: PayloadAction<CartItem>) => {
+      if (!Number.isInteger(action.payload.quantity) || action.payload.quantity < 1 || action.payload.stock < 1) return;
       const existingItem = state.items.find(
         (item) => item._id === action.payload._id
       );
@@ -60,7 +63,7 @@ const cartSlice = createSlice({
         (item) => item._id === action.payload.id
       );
 
-      if (item) {
+      if (item && Number.isInteger(action.payload.quantity)) {
         item.quantity = Math.min(
           item.stock,
           Math.max(1, action.payload.quantity)
@@ -69,7 +72,8 @@ const cartSlice = createSlice({
     },
 
     setCart: (state, action: PayloadAction<CartItem[]>) => {
-      state.items = action.payload;
+      state.hydrated = true;
+      state.items = action.payload.filter(item => item && typeof item._id === "string" && /^[a-f0-9]{24}$/i.test(item._id) && typeof item.name === "string" && typeof item.image === "string" && Number.isFinite(item.price) && item.price >= 0 && Number.isInteger(item.stock) && item.stock > 0 && Number.isInteger(item.quantity) && item.quantity > 0).map(item => ({ ...item, quantity: Math.min(item.stock, item.quantity) }));
     },
 
     clearCart: (state) => {

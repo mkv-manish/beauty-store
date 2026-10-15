@@ -1,196 +1,59 @@
 "use client";
-
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { categories } from "@/config/categories";
+import { useEffect, useState, useTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { FiArrowLeft, FiSearch } from "react-icons/fi";
-import ProductCard from "@/components/ProductCard";
-
-type Product = {
-    _id: string;
-    name: string;
-    price: number;
-    category: "skin" | "hair";
-    image: string;
-    description: string;
-    ingredients: string;
-    howToUse: string;
-    stock: number;
-};
-
+import { FiArrowLeft, FiArrowRight, FiSearch } from "react-icons/fi";
+import ProductCard from "@/components/products/ProductCard";
+import type { ProductData } from "@/types/product";
+type Catalog = { products: ProductData[]; total: number; pages: number };
 export default function ShopContent() {
-    const searchParams = useSearchParams();
-
-    const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-
-    const search = (searchParams.get("search") ?? "").trim();
-    const requestedCategory = searchParams.get("category");
-
-    const category =
-        requestedCategory === "skin" || requestedCategory === "hair"
-            ? requestedCategory
-            : "all";
-
-    useEffect(() => {
-        async function fetchProducts() {
-            try {
-                setLoading(true);
-                setError("");
-
-                const response = await fetch("/api/products");
-
-                if (!response.ok) {
-                    throw new Error("Unable to load products.");
-                }
-
-                const data = await response.json();
-
-                if (!Array.isArray(data)) {
-                    throw new Error("Invalid product data.");
-                }
-
-                setProducts(data);
-            } catch {
-                setError(
-                    "Products load nahi ho paaye. Please refresh karke try karein.",
-                );
-            } finally {
-                setLoading(false);
-            }
-        }
-
-        fetchProducts();
-    }, []);
-
-    const filteredProducts = useMemo(() => {
-        const query = search.toLowerCase();
-
-        return products.filter((product) => {
-            const matchesSearch =
-                !query ||
-                product.name.toLowerCase().includes(query) ||
-                product.description?.toLowerCase().includes(query) ||
-                product.category.toLowerCase().includes(query);
-
-            const matchesCategory =
-                category === "all" || product.category === category;
-
-            return matchesSearch && matchesCategory;
-        });
-    }, [products, search, category]);
-
-    let heading = "For You";
-    let description =
-        "Explore everyday essentials for your skincare and haircare routine.";
-
-    if (search) {
-        heading = `Results for "${search}"`;
-        description = `${filteredProducts.length} matching product${
-            filteredProducts.length === 1 ? "" : "s"
-        } found.`;
-    } else if (category === "skin") {
-        heading = "Skin Care";
-        description =
-            "Find the right essentials for your everyday skincare routine.";
-    } else if (category === "hair") {
-        heading = "Hair Care";
-        description = "Discover essentials for your everyday haircare routine.";
+  const params = useSearchParams();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const queryString = params.toString();
+  const [data, setData] = useState<Catalog | null>(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const search = params.get("search") ?? "";
+  const category = params.get("category") ?? "all";
+  const page = Math.max(1, Number(params.get("page")) || 1);
+  useEffect(() => {
+    const controller = new AbortController();
+    async function load() {
+      setLoading(true); setError("");
+      try {
+        const response = await fetch(`/api/products?${queryString}`, { signal: controller.signal });
+        if (!response.ok) throw new Error("Unable to load products. Please try again.");
+        setData(await response.json());
+      } catch (error) { if (!controller.signal.aborted) setError(error instanceof Error ? error.message : "Unable to load products."); }
+      finally { if (!controller.signal.aborted) setLoading(false); }
     }
-
-    return (
-        <main className="min-h-screen bg-[#FBF8F3]">
-            <section className="border-b border-[#E7E2DA] bg-white">
-                <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-                    <Link
-                        href="/"
-                        className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-[#687169] transition hover:text-[#26352B]"
-                    >
-                        <FiArrowLeft size={16} />
-                        Back to home
-                    </Link>
-
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#7B8A74] sm:text-sm">
-                        Dermiscaa Collection
-                    </p>
-
-                    <h1 className="break-words text-3xl font-semibold tracking-tight text-[#26352B] sm:text-4xl lg:text-5xl">
-                        {heading}
-                    </h1>
-
-                    <p className="mt-3 max-w-2xl text-sm leading-6 text-[#687169] sm:text-base">
-                        {description}
-                    </p>
-                </div>
-            </section>
-
-            <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-                {!loading && !error && filteredProducts.length > 0 && (
-                    <p className="mb-5 text-sm text-[#687169]">
-                        Showing {filteredProducts.length}{" "}
-                        {filteredProducts.length === 1 ? "product" : "products"}
-                    </p>
-                )}
-
-                {loading ? (
-                    <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-                        {Array.from({ length: 8 }).map((_, index) => (
-                            <div
-                                key={index}
-                                className="animate-pulse overflow-hidden rounded-2xl border border-[#E7E2DA] bg-white"
-                            >
-                                <div className="aspect-square bg-[#EDE9E1]" />
-                                <div className="space-y-3 p-3 sm:p-4">
-                                    <div className="h-4 rounded bg-[#EDE9E1]" />
-                                    <div className="h-4 w-1/3 rounded bg-[#EDE9E1]" />
-                                    <div className="h-9 rounded-full bg-[#EDE9E1]" />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : error ? (
-                    <div className="rounded-2xl border border-[#E7E2DA] bg-white px-5 py-12 text-center">
-                        <p className="text-[#687169]">{error}</p>
-                        <button
-                            type="button"
-                            onClick={() => window.location.reload()}
-                            className="mt-4 rounded-full bg-[#26352B] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#3C5141]"
-                        >
-                            Try again
-                        </button>
-                    </div>
-                ) : filteredProducts.length === 0 ? (
-                    <div className="rounded-2xl border border-[#E7E2DA] bg-white px-5 py-12 text-center sm:py-16">
-                        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#E7EBDD] text-[#52634F]">
-                            <FiSearch size={23} />
-                        </span>
-
-                        <h2 className="mt-4 text-xl font-semibold text-[#26352B]">
-                            No products found
-                        </h2>
-
-                        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#687169]">
-                            {search
-                                ? "Try another product name, or explore our complete collection."
-                                : "There are no products in this category yet. Explore our complete collection instead."}
-                        </p>
-
-                        <Link
-                            href="/shop"
-                            className="mt-6 inline-flex items-center justify-center rounded-full bg-[#26352B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#3C5141]"
-                        >
-                            Explore all products
-                        </Link>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-                        {filteredProducts.map((product) => (
-                            <ProductCard key={product._id} product={product} />
-                        ))}
-                    </div>
-                )}
-            </section>
-        </main>
-    );
+    load(); return () => controller.abort();
+  }, [queryString]);
+  function update(key: string, value: string) {
+    const next = new URLSearchParams(queryString);
+    if (value && value !== "all") next.set(key, value); else next.delete(key);
+    if (key !== "page") next.delete("page");
+    startTransition(() => router.push(`/shop?${next}`));
+  }
+  return <main className="min-h-screen">
+    <section className="collection-heading shop-heading"><div className="mx-auto max-w-7xl">
+      <Link href="/" className="shop-back-link inline-flex items-center gap-2 text-sm text-[#687169]"><FiArrowLeft /> Back to home</Link>
+      <p className="eyebrow">The Dermiscaa collection</p>
+      <h1 className="section-title mt-3">{search ? `Results for “${search}”` : categories.find(item => item.id === category)?.headline ?? "Everyday care, beautifully simple."}</h1>
+      <p className="mt-4 max-w-xl text-sm leading-7 text-[#687169] sm:text-base">A little something for your skin, your hair, and your everyday routine.</p>
+    </div></section>
+    <section className="section-shell !pt-6">
+      <div className="catalog-toolbar">
+        <div className="flex flex-wrap gap-2" aria-label="Filter by category">{[["all", "All essentials"], ...categories.map(item => [item.id, item.label])].map(([value, label]) => <button key={value} disabled={isPending} onClick={() => update("category", value)} aria-pressed={category === value} className={`filter-pill ${category === value ? "active" : ""}`}>{label}</button>)}</div>
+        <label className="flex items-center gap-3 text-sm text-[#687169]">Sort by<select disabled={isPending} aria-label="Sort products" value={params.get("sort") ?? "newest"} onChange={event => update("sort", event.target.value)} className="min-h-11 rounded-xl border border-[#DDD7CE] bg-white px-3 text-[#26352B]"><option value="newest">Newest first</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option></select></label>
+      </div>
+      <p className="mb-5 text-sm text-[#687169]" aria-live="polite">{loading ? "Finding your essentials…" : `${data?.total ?? 0} essentials found`}</p>
+      {loading ? <div className="product-grid" aria-busy="true">{Array.from({ length: 8 }, (_, i) => <div key={i} className="aspect-[3/4] animate-pulse rounded-3xl bg-[#EDE8E0]" />)}</div> : error ? <div role="alert" className="empty-panel"><p>{error}</p><button className="secondary-link mt-5" onClick={() => window.location.reload()}>Try again</button></div> : !data?.products.length ? <div className="empty-panel"><FiSearch size={30} className="mx-auto mb-5" /><h2 className="text-2xl font-semibold">No essentials found</h2><p className="mt-3 text-sm text-[#687169]">Try another search or explore the full collection.</p><Link href="/shop" className="primary-link mt-6">Explore all essentials</Link></div> : <>
+        <div className="product-grid">{data.products.map(product => <ProductCard key={product._id} product={product} />)}</div>
+        {data.pages > 1 && <nav aria-label="Catalog pages" className="mt-10 flex items-center justify-center gap-5"><button className="filter-pill" disabled={isPending || page <= 1} onClick={() => update("page", String(page - 1))}><FiArrowLeft /> Previous</button><span className="text-sm">{page} / {data.pages}</span><button className="filter-pill" disabled={isPending || page >= data.pages} onClick={() => update("page", String(page + 1))}>Next <FiArrowRight /></button></nav>}
+      </>}
+    </section>
+  </main>;
 }

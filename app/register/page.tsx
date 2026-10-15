@@ -1,5 +1,6 @@
 "use client";
 
+import { clearLegacyAuth, notifyAuthChange } from "@/lib/auth-events";
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -31,8 +32,8 @@ export default function RegisterPage() {
             return;
         }
 
-        if (password.length < 6) {
-            setError("Password must be at least 6 characters.");
+        if (password.length < 8) {
+            setError("Password must be at least 8 characters.");
             return;
         }
 
@@ -58,18 +59,17 @@ export default function RegisterPage() {
                 throw new Error(data.message || "Registration failed.");
             }
 
-            if (!data.token || !data.user) {
+            if (!data.user) {
                 throw new Error(
-                    "Registration response is missing user or token data.",
+                    "Unable to establish your session.",
                 );
             }
 
             // Save authentication data.
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify(data.user));
+            clearLegacyAuth();
 
             // Update the Navbar immediately in the same tab.
-            window.dispatchEvent(new Event("auth-change"));
+            notifyAuthChange(data.user);
 
             router.replace("/shop");
             router.refresh();
@@ -175,7 +175,7 @@ export default function RegisterPage() {
                                 </label>
 
                                 <div className="flex">
-                                    <span className="flex items-center rounded-l-xl border border-r-0 border-gray-300 bg-[#F9F5EE] px-3 text-sm text-[#26332A]">
+                                    <span className="phone-prefix flex items-center rounded-l-xl border border-r-0 border-gray-300 bg-[#F9F5EE] px-3 text-sm text-[#26332A]">
                                         +91
                                     </span>
 
@@ -221,9 +221,9 @@ export default function RegisterPage() {
                                     onChange={(event) =>
                                         setPassword(event.target.value)
                                     }
-                                    placeholder="Minimum 6 characters"
+                                    placeholder="Minimum 8 characters"
                                     autoComplete="new-password"
-                                    minLength={6}
+                                    minLength={8}
                                     required
                                     className={inputClass}
                                 />

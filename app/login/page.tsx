@@ -1,5 +1,6 @@
 "use client";
 
+import { clearLegacyAuth, notifyAuthChange } from "@/lib/auth-events";
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -49,21 +50,21 @@ export default function LoginPage() {
                 throw new Error(data.message || "Login failed.");
             }
 
-            if (!data.token || !data.user) {
+            if (!data.user) {
                 throw new Error(
-                    "Login response is missing user or token data.",
+                    "Unable to establish your session.",
                 );
             }
 
             // Save authentication data.
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify(data.user));
+            clearLegacyAuth();
 
             // Update the Navbar immediately in the same tab.
-            window.dispatchEvent(new Event("auth-change"));
+            notifyAuthChange(data.user);
 
             // Navigate after successful login.
-            router.replace("/");
+            const next = new URLSearchParams(window.location.search).get("next");
+            router.replace(next && /^\/(?:checkout|wishlist|orders|cart|product\/[a-f0-9]{24})$/.test(next) ? next : "/shop");
             router.refresh();
         } catch (error) {
             setError(error instanceof Error ? error.message : "Login failed.");

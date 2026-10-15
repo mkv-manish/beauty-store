@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function NotFound() { return <main className="section-shell min-h-[65vh]"><div className="empty-panel"><p className="eyebrow">Not found</p><h1 className="section-title mt-3">This essential isn’t here</h1><p className="mt-4 text-sm text-[#687169]">The page or product may have moved. Find something lovely in our collection.</p><Link href="/shop" className="primary-link mt-6">Explore products</Link></div></main>; }

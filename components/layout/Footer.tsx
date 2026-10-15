@@ -11,12 +11,12 @@ export default function Footer() {
                     <div>
                         <Link
                             href="/"
-                            aria-label="Dermisca home"
+                            aria-label="Dermiscaa home"
                             className="inline-flex items-center"
                         >
                             <Image
                                 src="/images/logo/logo.png"
-                                alt="Dermisca"
+                                alt="Dermiscaa"
                                 width={160}
                                 height={55}
                                 className="h-16 w-auto object-contain"
@@ -28,7 +28,7 @@ export default function Footer() {
                             everyday beauty routine.
                         </p>
 
-                        <p className="mt-4 text-sm font-medium text-[#7B8A74]">
+                        <p className="mt-4 text-sm font-medium text-[#52634F]">
                             Pure care. Everyday confidence.
                         </p>
                     </div>
@@ -60,7 +60,7 @@ export default function Footer() {
                     {/* Brand Description */}
                     <div>
                         <h3 className="text-sm font-semibold uppercase tracking-[0.15em] text-[#26352B]">
-                            Dermisca Care
+                            Dermiscaa Care
                         </h3>
 
                         <p className="mt-5 max-w-sm text-sm leading-6 text-[#687169]">
@@ -70,7 +70,7 @@ export default function Footer() {
 
                         <Link
                             href="/shop"
-                            className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#7B8A74] transition-colors hover:text-[#26352B]"
+                            className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#52634F] transition-colors hover:text-[#26352B]"
                         >
                             Explore Collection
                             <FiArrowUpRight size={16} />
@@ -81,7 +81,7 @@ export default function Footer() {
                 {/* Copyright */}
                 <div className="mt-10 border-t border-[#E7E2DA] pt-6 text-center">
                     <p className="text-xs text-[#687169]">
-                        © {new Date().getFullYear()} Dermisca. All rights
+                        © {new Date().getFullYear()} Dermiscaa. All rights
                         reserved.
                     </p>
                 </div>

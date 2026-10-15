@@ -16,6 +16,8 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
     },
 
+    phone: { type: String, trim: true, match: /^[6-9]\d{9}$/, unique: true, sparse: true },
+
     password: {
       type: String,
       required: true,

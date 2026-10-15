@@ -163,14 +163,19 @@ async function seedDatabase() {
 
     await mongoose.connect(mongoUri);
 
-    await Product.deleteMany({});
-
-    await Product.insertMany(products);
+    if (process.argv.includes("--reset")) {
+      if (process.env.ALLOW_SEED_RESET !== "true") throw new Error("Set ALLOW_SEED_RESET=true to explicitly permit deleting products.");
+      await Product.deleteMany({});
+    }
+    for (const product of products) {
+      await Product.updateOne({ name: product.name, category: product.category }, { $setOnInsert: product }, { upsert: true });
+    }
 
     console.log("Database seeded successfully.");
     console.log(`${products.length} products added.`);
   } catch (error) {
     console.error("Seed error:", error);
+    process.exitCode = 1;
   } finally {
     await mongoose.disconnect();
   }

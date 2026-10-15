@@ -1,8 +1,10 @@
 "use client";
 
+import { BagIcon as FiShoppingBag } from "@/components/ui/BeautyIcons";
+
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { FiCalendar, FiPackage, FiShoppingBag } from "react-icons/fi";
+import { FiCalendar, FiPackage } from "react-icons/fi";
 import Link from "next/link";
 
 type OrderItem = {
@@ -31,20 +33,14 @@ export default function OrdersPage() {
     const [error, setError] = useState("");
 
     useEffect(() => {
+        let controller: AbortController | undefined;
         async function getOrders() {
+            controller?.abort();
+            controller = new AbortController();
+            const signal = controller.signal;
+            setLoading(true); setError(""); setOrders([]);
             try {
-                const token = localStorage.getItem("token");
-
-                if (!token) {
-                    setError("Please login to view your orders.");
-                    return;
-                }
-
-                const response = await fetch("/api/orders/my-orders", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const response = await fetch("/api/orders/my-orders", { cache: "no-store", signal });
 
                 const data = await response.json();
 
@@ -52,19 +48,26 @@ export default function OrdersPage() {
                     throw new Error(data.message || "Unable to load orders.");
                 }
 
-                setOrders(data);
+                if (!signal.aborted) setOrders(data);
             } catch (error) {
+                if (signal.aborted) return;
                 setError(
                     error instanceof Error
                         ? error.message
                         : "Unable to load orders.",
                 );
             } finally {
-                setLoading(false);
+                if (!signal.aborted) setLoading(false);
             }
         }
 
-        getOrders();
+        function storage(event: StorageEvent) { if (event.key === "dermisca-auth-event") void getOrders(); }
+        function visible() { if (document.visibilityState === "visible") void getOrders(); }
+        void getOrders();
+        window.addEventListener("auth-change", getOrders);
+        window.addEventListener("storage", storage);
+        document.addEventListener("visibilitychange", visible);
+        return () => { controller?.abort(); window.removeEventListener("auth-change", getOrders); window.removeEventListener("storage", storage); document.removeEventListener("visibilitychange", visible); };
     }, []);
 
     if (loading) {
@@ -83,7 +86,7 @@ export default function OrdersPage() {
         return (
             <main className="min-h-[70vh] bg-[#FBF8F3] px-4 py-20">
                 <div className="mx-auto max-w-md rounded-3xl border border-[#E7E2DA] bg-white p-8 text-center">
-                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#EFDCD6] text-[#7B8A74]">
+                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#EFDCD6] text-[#52634F]">
                         <FiPackage size={24} />
                     </div>
 
@@ -96,8 +99,8 @@ export default function OrdersPage() {
                     </p>
 
                     <Link
-                        href="/login"
-                        className="mt-6 inline-flex rounded-full bg-[#7B8A74] px-6 py-3 text-sm font-semibold text-white"
+                        href="/login?next=/orders"
+                        className="mt-6 inline-flex rounded-full bg-[#52634F] px-6 py-3 text-sm font-semibold text-white"
                     >
                         Login
                     </Link>
@@ -110,7 +113,7 @@ export default function OrdersPage() {
         return (
             <main className="min-h-[70vh] bg-[#FBF8F3] px-4 py-16 sm:px-6 sm:py-24">
                 <div className="mx-auto max-w-md text-center">
-                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#EFDCD6] text-[#7B8A74]">
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#EFDCD6] text-[#52634F]">
                         <FiPackage size={30} />
                     </div>
 
@@ -124,7 +127,7 @@ export default function OrdersPage() {
 
                     <Link
                         href="/shop"
-                        className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#7B8A74] px-6 py-3 text-sm font-semibold text-white"
+                        className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#52634F] px-6 py-3 text-sm font-semibold text-white"
                     >
                         <FiShoppingBag size={17} />
                         Start Shopping
@@ -141,7 +144,7 @@ export default function OrdersPage() {
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                 >
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7B8A74]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#52634F]">
                         Your Account
                     </p>
 

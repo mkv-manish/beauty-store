@@ -1,79 +1,24 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { connectDB } from "@/lib/db";
 import User from "@/models/User";
-import { createToken } from "@/lib/auth";
-
+import { checkOrigin, sessionResponse } from "@/lib/auth";
+import { allowAuth } from "@/lib/rate-limit";
+import { email, phone, text, InputError } from "@/lib/validation";
+const dummyHash = bcrypt.hashSync("unused-comparison-password", 12);
 export async function POST(request: Request) {
+  if (!checkOrigin(request)) return NextResponse.json({ message: "Invalid origin." }, { status: 403 });
   try {
     const body = await request.json();
-    const { identifier, password } = body;
-
-    if (
-      typeof identifier !== "string" ||
-      !identifier.trim() ||
-      typeof password !== "string" ||
-      !password
-    ) {
-      return NextResponse.json(
-        { message: "Email or mobile number and password are required." },
-        { status: 400 }
-      );
-    }
-
-    const value = identifier.trim();
-    const isEmail = value.includes("@");
-
-    if (!isEmail && !/^[6-9]\d{9}$/.test(value)) {
-      return NextResponse.json(
-        { message: "Enter a valid email or 10-digit mobile number." },
-        { status: 400 }
-      );
-    }
-
-    await connectDB();
-
-    const user = await User.findOne(
-      isEmail
-        ? { email: value.toLowerCase() }
-        : { phone: value }
-    );
-
-    if (!user) {
-      return NextResponse.json(
-        { message: "Invalid email/mobile number or password." },
-        { status: 401 }
-      );
-    }
-
-    const passwordMatch = await bcrypt.compare(
-      password,
-      user.password
-    );
-
-    if (!passwordMatch) {
-      return NextResponse.json(
-        { message: "Invalid email/mobile number or password." },
-        { status: 401 }
-      );
-    }
-
-    const token = createToken(user._id.toString());
-
-    return NextResponse.json({
-      message: "Login successful.",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-      },
-    });
-  } catch {
-    return NextResponse.json(
-      { message: "Login failed." },
-      { status: 500 }
-    );
+    const raw = text(body?.identifier, "Email or mobile number", 254);
+    const identifier = raw.includes("@") ? email(raw) : phone(raw);
+    if (typeof body?.password !== "string" || !body.password || new TextEncoder().encode(body.password).length > 72) throw new InputError("Enter a valid password.");
+    if (!await allowAuth(identifier, "login")) return NextResponse.json({ message: "Too many attempts. Try again in 15 minutes." }, { status: 429, headers: { "Retry-After": "900" } });
+    const user = await User.findOne(identifier.includes("@") ? { email: identifier } : { phone: identifier });
+    const match = await bcrypt.compare(body.password, user?.password ?? dummyHash);
+    if (!user || !match) return NextResponse.json({ message: "Invalid email/mobile number or password." }, { status: 401 });
+    return sessionResponse(user);
+  } catch (error) {
+    if (error instanceof InputError || error instanceof SyntaxError) return NextResponse.json({ message: error.message }, { status: 400 });
+    return NextResponse.json({ message: "Login failed." }, { status: 500 });
   }
 }

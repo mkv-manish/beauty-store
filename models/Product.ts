@@ -1,3 +1,4 @@
+import { categoryIds } from "../config/categories";
 import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema(
@@ -9,14 +10,17 @@ const productSchema = new mongoose.Schema(
 
     price: {
       type: Number,
+      min: 0,
       required: true,
     },
 
     category: {
       type: String,
-      enum: ["skin", "hair"],
+      enum: categoryIds,
       required: true,
     },
+
+    images: { type: [String], default: [] },
 
     image: {
       type: String,
@@ -40,6 +44,8 @@ howToUse: {
 
 stock: {
   type: Number,
+  min: 0,
+  validate: Number.isInteger,
   required: true,
   default: 0,
 },

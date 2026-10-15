@@ -1,22 +1,22 @@
 "use client";
 
 import { motion } from "motion/react";
-import { FiFeather, FiHeart, FiShield } from "react-icons/fi";
+import { LeafIcon, RitualIcon, CareIcon } from "@/components/ui/BeautyIcons";
 
 const benefits = [
     {
-        icon: FiFeather,
+        icon: LeafIcon,
         title: "Thoughtful Ingredients",
         description:
             "Simple formulas made for an easy everyday beauty routine.",
     },
     {
-        icon: FiHeart,
+        icon: RitualIcon,
         title: "Everyday Care",
         description: "Skincare and haircare essentials designed for daily use.",
     },
     {
-        icon: FiShield,
+        icon: CareIcon,
         title: "Quality Focused",
         description: "Carefully selected products with quality at the center.",
     },
@@ -33,8 +33,8 @@ export default function WhyChooseUs() {
                     transition={{ duration: 0.45 }}
                     className="mx-auto max-w-2xl text-center"
                 >
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#7B8A74]">
-                        Why Dermisca
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#52634F]">
+                        Why Dermiscaa
                     </p>
 
                     <h2 className="mt-2 text-3xl font-bold tracking-tight text-[#26352B] sm:text-4xl">
@@ -70,7 +70,7 @@ export default function WhyChooseUs() {
                                 whileHover={{ y: -4 }}
                                 className="rounded-2xl border border-[#E7E2DA] bg-[#FBF8F3] p-6"
                             >
-                                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F4E3DE] text-[#7B8A74]">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F4E3DE] text-[#52634F]">
                                     <Icon size={20} />
                                 </div>
 
