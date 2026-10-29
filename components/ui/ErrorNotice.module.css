@@ -1,0 +1,17 @@
+.notice { display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1px solid #ebd1cb; border-radius:10px; background:#fff7f5; color:#814339; text-align:left; }
+.icon { flex-shrink:0; margin-top:1px; color:#ad5e50; }
+.content { flex:1; min-width:0; }
+.title { margin:0 0 3px; font-size:13px; font-weight:600; line-height:1.5; }
+.message { font-size:12px; line-height:1.65; overflow-wrap:anywhere; }
+.action { display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; margin-top:5px; }
+.action button, .action a, .message a { display:inline-flex; align-items:center; min-height:36px; font-size:12px; font-weight:600; text-decoration:underline; text-underline-offset:3px; color:#814339; }
+.action button:hover, .action a:hover { color:#582b24; }
+@media(max-width:767px) {
+ .notice { padding:10px 12px; gap:8px; border-radius:8px; }
+ .title { font-size:12px; }
+ .message, .action button, .action a { font-size:11px; }
+}
+@media(prefers-reduced-motion:no-preference) {
+ .notice { animation:appear .2s ease-out; }
+ @keyframes appear { from { opacity:0; transform:translateY(-3px); } to { opacity:1; transform:translateY(0); } }
+}

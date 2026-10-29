@@ -24,7 +24,7 @@ const benefits = [
 
 export default function WhyChooseUs() {
     return (
-        <section className="bg-white px-4 py-14 sm:px-6 sm:py-20">
+        <section className="care-values bg-white px-4 py-14 sm:px-6 sm:py-20">
             <div className="mx-auto max-w-7xl">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -33,15 +33,15 @@ export default function WhyChooseUs() {
                     transition={{ duration: 0.45 }}
                     className="mx-auto max-w-2xl text-center"
                 >
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#52634F]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#287C78]">
                         Why Dermiscaa
                     </p>
 
-                    <h2 className="mt-2 text-3xl font-bold tracking-tight text-[#26352B] sm:text-4xl">
+                    <h2 className="section-title mt-3">
                         Beauty care, kept simple.
                     </h2>
 
-                    <p className="mt-3 text-sm leading-6 text-[#687169] sm:text-base">
+                    <p className="mt-3 text-sm leading-6 text-[#617B78] sm:text-base">
                         Everything you need for a simple and comfortable
                         everyday routine.
                     </p>
@@ -68,17 +68,17 @@ export default function WhyChooseUs() {
                                     delay: index * 0.08,
                                 }}
                                 whileHover={{ y: -4 }}
-                                className="rounded-2xl border border-[#E7E2DA] bg-[#FBF8F3] p-6"
+                                className="rounded-2xl border border-[#D9E7E3] bg-[#F4FAF8] p-6"
                             >
-                                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F4E3DE] text-[#52634F]">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#E5F2EF] text-[#287C78]">
                                     <Icon size={20} />
                                 </div>
 
-                                <h3 className="mt-5 text-lg font-semibold text-[#26352B]">
+                                <h3 className="mt-5 text-lg font-semibold text-[#203C3B]">
                                     {benefit.title}
                                 </h3>
 
-                                <p className="mt-2 text-sm leading-6 text-[#687169]">
+                                <p className="mt-2 text-sm leading-6 text-[#617B78]">
                                     {benefit.description}
                                 </p>
                             </motion.div>

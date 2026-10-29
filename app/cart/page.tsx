@@ -30,27 +30,27 @@ export default function CartPage() {
 
     if (items.length === 0) {
         return (
-            <main className="min-h-[70vh] bg-[#FBF8F3] px-4 py-16 sm:px-6 sm:py-24">
+            <main className="min-h-[70vh] bg-[#F4FAF8] px-4 py-16 sm:px-6 sm:py-24">
                 <motion.div
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="mx-auto max-w-md text-center"
                 >
-                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#EFDCD6] text-[#52634F]">
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#E5F2EF] text-[#287C78]">
                         <FiShoppingBag size={30} />
                     </div>
 
-                    <h1 className="mt-6 text-2xl font-bold text-[#26352B]">
+                    <h1 className="mt-6 text-2xl font-bold text-[#203C3B]">
                         Your cart is empty
                     </h1>
 
-                    <p className="mt-2 text-sm leading-6 text-[#687169]">
+                    <p className="mt-2 text-sm leading-6 text-[#617B78]">
                         Add something from our collection to get started.
                     </p>
 
                     <Link
                         href="/shop"
-                        className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#52634F] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#3C5141]"
+                        className="commerce-action mt-7 inline-flex items-center gap-2 rounded-full bg-[#287C78] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#246662]"
                     >
                         Continue Shopping
                         <FiArrowRight size={16} />
@@ -61,22 +61,18 @@ export default function CartPage() {
     }
 
     return (
-        <main className="min-h-screen bg-[#FBF8F3]">
+        <main className="commerce-page cart-page min-h-screen bg-[#F4FAF8]">
             <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
                 {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                 >
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#52634F]">
-                        Your Selection
-                    </p>
-
-                    <h1 className="mt-2 text-3xl font-bold text-[#26352B] sm:text-4xl">
+                    <h1 className="mt-2 text-2xl font-semibold text-[#203C3B] sm:text-3xl">
                         Shopping Cart
                     </h1>
 
-                    <p className="mt-2 text-sm text-[#687169]">
+                    <p className="mt-2 text-sm text-[#617B78]">
                         Review your products before checkout.
                     </p>
                 </motion.div>
@@ -90,11 +86,11 @@ export default function CartPage() {
                                 initial={{ opacity: 0, y: 15 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.05 }}
-                                className="rounded-2xl border border-[#E7E2DA] bg-white p-3 sm:p-5"
+                                className="rounded-2xl border border-[#D9E7E3] bg-white p-3 sm:p-5"
                             >
                                 <div className="flex gap-3 sm:gap-5">
                                     {/* Image */}
-                                    <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-[#F4EEE7] sm:h-32 sm:w-32">
+                                    <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-[#EFF7F5] sm:h-32 sm:w-32">
                                         <Image
                                             src={item.image}
                                             alt={item.name}
@@ -108,11 +104,11 @@ export default function CartPage() {
                                     <div className="min-w-0 flex-1">
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="min-w-0">
-                                                <h2 className="line-clamp-2 text-sm font-semibold text-[#26352B] sm:text-base">
+                                                <h2 className="line-clamp-2 text-sm font-semibold text-[#203C3B] sm:text-base">
                                                     {item.name}
                                                 </h2>
 
-                                                <p className="mt-1 text-sm font-semibold text-[#26352B]">
+                                                <p className="mt-1 text-sm font-semibold text-[#203C3B]">
                                                     ₹{item.price}
                                                 </p>
                                             </div>
@@ -139,7 +135,7 @@ export default function CartPage() {
 
                                         {/* Quantity */}
                                         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                                            <div className="flex items-center overflow-hidden rounded-lg border border-[#DDD7CE]">
+                                            <div className="flex items-center overflow-hidden rounded-lg border border-[#D9E7E3]">
                                                 <button
                                                     type="button"
                                                     onClick={() =>
@@ -156,12 +152,12 @@ export default function CartPage() {
                                                     disabled={
                                                         item.quantity <= 1
                                                     }
-                                                    className="flex h-11 w-11 items-center justify-center text-[#26352B] hover:bg-[#F4EEE7] disabled:opacity-40"
+                                                    className="flex h-11 w-11 items-center justify-center text-[#203C3B] hover:bg-[#EFF7F5] disabled:opacity-40"
                                                 >
                                                     <FiMinus size={13} />
                                                 </button>
 
-                                                <span className="flex h-11 min-w-9 items-center justify-center border-x border-[#DDD7CE] text-xs font-semibold text-[#26352B]">
+                                                <span className="flex h-11 min-w-9 items-center justify-center border-x border-[#D9E7E3] text-xs font-semibold text-[#203C3B]">
                                                     {item.quantity}
                                                 </span>
 
@@ -182,14 +178,14 @@ export default function CartPage() {
                                                         item.quantity >=
                                                         item.stock
                                                     }
-                                                    className="flex h-11 w-11 items-center justify-center text-[#26352B] hover:bg-[#F4EEE7] disabled:opacity-40"
+                                                    className="flex h-11 w-11 items-center justify-center text-[#203C3B] hover:bg-[#EFF7F5] disabled:opacity-40"
                                                 >
                                                     <FiPlus size={13} />
                                                 </button>
                                             </div>
 
-                                            <p className="text-sm font-bold text-[#26352B]">
-                                                ₹{item.price * item.quantity}
+                                            <p className="text-sm font-bold text-[#203C3B]">
+                                                ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                                             </p>
                                         </div>
                                     </div>
@@ -202,37 +198,37 @@ export default function CartPage() {
                     <motion.div
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="h-fit rounded-2xl border border-[#E7E2DA] bg-white p-5 sm:p-6 lg:sticky lg:top-44"
+                        className="h-fit rounded-2xl border border-[#D9E7E3] bg-white p-5 sm:p-6 lg:sticky lg:top-24"
                     >
-                        <h2 className="text-lg font-bold text-[#26352B]">
+                        <h2 className="text-lg font-bold text-[#203C3B]">
                             Order Summary
                         </h2>
 
-                        <div className="mt-6 flex items-center justify-between text-sm text-[#687169]">
+                        <div className="mt-6 flex items-center justify-between text-sm text-[#617B78]">
                             <span>Items</span>
-                            <span>{items.length}</span>
+                            <span>{items.reduce((count, item) => count + item.quantity, 0)}</span>
                         </div>
 
-                        <div className="mt-3 flex items-center justify-between text-sm text-[#687169]">
+                        <div className="mt-3 flex items-center justify-between text-sm text-[#617B78]">
                             <span>Payment</span>
                             <span>Cash on Delivery</span>
                         </div>
 
-                        <div className="my-5 border-t border-[#E7E2DA]" />
+                        <div className="my-5 border-t border-[#D9E7E3]" />
 
                         <div className="flex items-center justify-between">
-                            <span className="font-semibold text-[#26352B]">
+                            <span className="font-semibold text-[#203C3B]">
                                 Total
                             </span>
 
-                            <span className="text-xl font-bold text-[#26352B]">
-                                ₹{total}
+                            <span className="text-xl font-bold text-[#203C3B]">
+                                ₹{total.toLocaleString("en-IN")}
                             </span>
                         </div>
 
                         <Link
                             href="/checkout"
-                            className="mt-6 flex h-12 items-center justify-center gap-2 rounded-xl bg-[#52634F] text-sm font-semibold text-white transition hover:bg-[#3C5141]"
+                            className="commerce-action mt-6 flex h-12 items-center justify-center gap-2 rounded-xl bg-[#287C78] text-sm font-semibold text-white transition hover:bg-[#246662]"
                         >
                             Proceed to Checkout
                             <FiArrowRight size={17} />
@@ -240,7 +236,7 @@ export default function CartPage() {
 
                         <Link
                             href="/shop"
-                            className="mt-3 flex h-11 items-center justify-center rounded-xl border border-[#DDD7CE] text-sm font-medium text-[#26352B] transition hover:bg-[#F4EEE7]"
+                            className="mt-3 flex h-11 items-center justify-center rounded-xl border border-[#D9E7E3] text-sm font-medium text-[#203C3B] transition hover:bg-[#EFF7F5]"
                         >
                             Continue Shopping
                         </Link>

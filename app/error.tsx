@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import ErrorNotice from "@/components/ui/ErrorNotice";
 export default function ErrorPage({ reset }: { reset: () => void }) {
-  return <main className="section-shell min-h-[65vh]"><div className="empty-panel" role="alert"><h1 className="section-title">A little pause</h1><p className="mt-4 text-sm text-[#687169]">We couldn’t load this page. Please try again.</p><div className="mt-6 flex flex-wrap justify-center gap-3"><button onClick={reset} className="primary-link">Try again</button><Link href="/shop" className="secondary-link">Back to shop</Link></div></div></main>;
+  return <main className="section-shell min-h-[60vh]"><h1 className="section-title mb-5">Something went wrong</h1><ErrorNotice action={<><button type="button" onClick={reset}>Try again</button><Link href="/shop">Back to shop</Link></>}>We couldn’t load this page. Please try again.</ErrorNotice></main>;
 }

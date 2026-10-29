@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { FiCalendar, FiPackage } from "react-icons/fi";
 import Link from "next/link";
+import ErrorNotice from "@/components/ui/ErrorNotice";
 
 type OrderItem = {
     product: string;
@@ -31,6 +32,8 @@ export default function OrdersPage() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [revision, setRevision] = useState(0);
+    const [needsLogin, setNeedsLogin] = useState(false);
 
     useEffect(() => {
         let controller: AbortController | undefined;
@@ -38,10 +41,11 @@ export default function OrdersPage() {
             controller?.abort();
             controller = new AbortController();
             const signal = controller.signal;
-            setLoading(true); setError(""); setOrders([]);
+            setLoading(true); setError(""); setOrders([]); setNeedsLogin(false);
             try {
                 const response = await fetch("/api/orders/my-orders", { cache: "no-store", signal });
 
+                if (!signal.aborted) setNeedsLogin(response.status === 401);
                 const data = await response.json();
 
                 if (!response.ok) {
@@ -68,15 +72,15 @@ export default function OrdersPage() {
         window.addEventListener("storage", storage);
         document.addEventListener("visibilitychange", visible);
         return () => { controller?.abort(); window.removeEventListener("auth-change", getOrders); window.removeEventListener("storage", storage); document.removeEventListener("visibilitychange", visible); };
-    }, []);
+    }, [revision]);
 
     if (loading) {
         return (
-            <main className="min-h-[70vh] bg-[#FBF8F3] px-4 py-20">
+            <main className="min-h-[70vh] bg-[#F4FAF8] px-4 py-20">
                 <div className="mx-auto max-w-5xl animate-pulse space-y-4">
-                    <div className="h-10 w-40 rounded bg-[#EDE8E0]" />
-                    <div className="h-32 rounded-2xl bg-[#EDE8E0]" />
-                    <div className="h-32 rounded-2xl bg-[#EDE8E0]" />
+                    <div className="h-10 w-40 rounded bg-[#D3E9E5]" />
+                    <div className="h-32 rounded-2xl bg-[#D3E9E5]" />
+                    <div className="h-32 rounded-2xl bg-[#D3E9E5]" />
                 </div>
             </main>
         );
@@ -84,50 +88,34 @@ export default function OrdersPage() {
 
     if (error) {
         return (
-            <main className="min-h-[70vh] bg-[#FBF8F3] px-4 py-20">
-                <div className="mx-auto max-w-md rounded-3xl border border-[#E7E2DA] bg-white p-8 text-center">
-                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#EFDCD6] text-[#52634F]">
-                        <FiPackage size={24} />
-                    </div>
-
-                    <h1 className="mt-5 text-xl font-bold text-[#26352B]">
-                        My Orders
-                    </h1>
-
-                    <p className="mt-2 text-sm leading-6 text-[#687169]">
-                        {error}
-                    </p>
-
-                    <Link
-                        href="/login?next=/orders"
-                        className="mt-6 inline-flex rounded-full bg-[#52634F] px-6 py-3 text-sm font-semibold text-white"
-                    >
-                        Login
-                    </Link>
-                </div>
+            <main className="section-shell min-h-[60vh]">
+                <h1 className="section-title mb-5">My orders</h1>
+                <ErrorNotice title={needsLogin ? "Sign in to view your orders" : "Orders couldn’t load"} action={needsLogin ? <Link href="/login?next=/orders">Sign in</Link> : <button type="button" onClick={() => setRevision(value => value + 1)}>Try again</button>}>
+                    {error}
+                </ErrorNotice>
             </main>
         );
     }
 
     if (orders.length === 0) {
         return (
-            <main className="min-h-[70vh] bg-[#FBF8F3] px-4 py-16 sm:px-6 sm:py-24">
+            <main className="min-h-[70vh] bg-[#F4FAF8] px-4 py-16 sm:px-6 sm:py-24">
                 <div className="mx-auto max-w-md text-center">
-                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#EFDCD6] text-[#52634F]">
+                    <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#E5F2EF] text-[#287C78]">
                         <FiPackage size={30} />
                     </div>
 
-                    <h1 className="mt-6 text-2xl font-bold text-[#26352B]">
+                    <h1 className="mt-6 text-2xl font-bold text-[#203C3B]">
                         No orders yet
                     </h1>
 
-                    <p className="mt-2 text-sm leading-6 text-[#687169]">
+                    <p className="mt-2 text-sm leading-6 text-[#617B78]">
                         Your previous orders will appear here.
                     </p>
 
                     <Link
                         href="/shop"
-                        className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#52634F] px-6 py-3 text-sm font-semibold text-white"
+                        className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#287C78] px-6 py-3 text-sm font-semibold text-white"
                     >
                         <FiShoppingBag size={17} />
                         Start Shopping
@@ -138,21 +126,21 @@ export default function OrdersPage() {
     }
 
     return (
-        <main className="min-h-screen bg-[#FBF8F3]">
+        <main className="min-h-screen bg-[#F4FAF8]">
             <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
                 <motion.div
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                 >
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#52634F]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#287C78]">
                         Your Account
                     </p>
 
-                    <h1 className="mt-2 text-3xl font-bold text-[#26352B] sm:text-4xl">
+                    <h1 className="mt-2 text-2xl font-semibold text-[#203C3B] sm:text-3xl">
                         My Orders
                     </h1>
 
-                    <p className="mt-2 text-sm text-[#687169]">
+                    <p className="mt-2 text-sm text-[#617B78]">
                         View your Dermisca order history.
                     </p>
                 </motion.div>
@@ -164,33 +152,33 @@ export default function OrdersPage() {
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.05 }}
-                            className="overflow-hidden rounded-2xl border border-[#E7E2DA] bg-white"
+                            className="overflow-hidden rounded-2xl border border-[#D9E7E3] bg-white"
                         >
                             {/* Order Header */}
-                            <div className="border-b border-[#E7E2DA] p-5 sm:p-6">
+                            <div className="border-b border-[#D9E7E3] p-5 sm:p-6">
                                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
-                                        <p className="text-xs text-[#687169]">
+                                        <p className="text-xs text-[#617B78]">
                                             Order ID
                                         </p>
 
-                                        <p className="mt-1 break-all text-sm font-semibold text-[#26352B]">
+                                        <p className="mt-1 break-all text-sm font-semibold text-[#203C3B]">
                                             {order._id}
                                         </p>
                                     </div>
 
                                     <div className="flex items-center gap-3">
-                                        <span className="rounded-full bg-[#E2E9DF] px-3 py-1.5 text-xs font-semibold capitalize text-[#687761]">
+                                        <span className="rounded-full bg-[#D3E9E5] px-3 py-1.5 text-xs font-semibold capitalize text-[#617B78]">
                                             {order.status}
                                         </span>
 
-                                        <span className="rounded-full bg-[#F4EEE7] px-3 py-1.5 text-xs font-medium text-[#687169]">
+                                        <span className="rounded-full bg-[#EFF7F5] px-3 py-1.5 text-xs font-medium text-[#617B78]">
                                             {order.paymentMethod}
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className="mt-4 flex items-center gap-2 text-xs text-[#687169]">
+                                <div className="mt-4 flex items-center gap-2 text-xs text-[#617B78]">
                                     <FiCalendar size={14} />
 
                                     {new Date(
@@ -212,41 +200,41 @@ export default function OrdersPage() {
                                             className="flex items-center justify-between gap-4"
                                         >
                                             <div className="min-w-0">
-                                                <p className="text-sm font-medium text-[#26352B]">
+                                                <p className="text-sm font-medium text-[#203C3B]">
                                                     {item.name}
                                                 </p>
 
-                                                <p className="mt-1 text-xs text-[#687169]">
+                                                <p className="mt-1 text-xs text-[#617B78]">
                                                     ₹{item.price} ×{" "}
                                                     {item.quantity}
                                                 </p>
                                             </div>
 
-                                            <p className="shrink-0 text-sm font-semibold text-[#26352B]">
+                                            <p className="shrink-0 text-sm font-semibold text-[#203C3B]">
                                                 ₹{item.price * item.quantity}
                                             </p>
                                         </div>
                                     ))}
                                 </div>
 
-                                <div className="my-5 border-t border-[#E7E2DA]" />
+                                <div className="my-5 border-t border-[#D9E7E3]" />
 
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm font-medium text-[#687169]">
+                                    <span className="text-sm font-medium text-[#617B78]">
                                         Order Total
                                     </span>
 
-                                    <span className="text-xl font-bold text-[#26352B]">
+                                    <span className="text-xl font-bold text-[#203C3B]">
                                         ₹{order.total}
                                     </span>
                                 </div>
 
-                                <div className="mt-5 rounded-xl bg-[#FBF8F3] p-4">
-                                    <p className="text-xs font-semibold text-[#26352B]">
+                                <div className="mt-5 rounded-xl bg-[#F4FAF8] p-4">
+                                    <p className="text-xs font-semibold text-[#203C3B]">
                                         Delivery Address
                                     </p>
 
-                                    <p className="mt-1 text-sm leading-6 text-[#687169]">
+                                    <p className="mt-1 text-sm leading-6 text-[#617B78]">
                                         {order.address}
                                     </p>
                                 </div>

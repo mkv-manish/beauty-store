@@ -1,4 +1,5 @@
 "use client";
+import ErrorNotice from "@/components/ui/ErrorNotice";
 import CartLoading from "@/components/cart/CartLoading";
 import { useCart } from "@/store/useCart";
 
@@ -22,11 +23,6 @@ export default function CheckoutPage() {
     const dispatch = useDispatch();
 
     const { items, hydrated } = useCart();
-
-    const total = items.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0,
-    );
 
     const [discountCode, setDiscountCode] = useState("");
     const [name, setName] = useState("");
@@ -101,23 +97,23 @@ export default function CheckoutPage() {
 
     if (items.length === 0) {
         return (
-            <main className="min-h-[70vh] bg-[#FBF8F3] px-4 py-20">
-                <div className="mx-auto max-w-md rounded-3xl border border-[#E7E2DA] bg-white p-8 text-center sm:p-10">
-                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#EFDCD6] text-[#52634F]">
+            <main className="min-h-[70vh] bg-[#F4FAF8] px-4 py-20">
+                <div className="mx-auto max-w-md rounded-3xl border border-[#D9E7E3] bg-white p-8 text-center sm:p-10">
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#E5F2EF] text-[#287C78]">
                         <FiCheck size={26} />
                     </div>
 
-                    <h1 className="mt-5 text-2xl font-bold text-[#26352B]">
+                    <h1 className="mt-5 text-2xl font-bold text-[#203C3B]">
                         Your cart is empty
                     </h1>
 
-                    <p className="mt-2 text-sm text-[#687169]">
+                    <p className="mt-2 text-sm text-[#617B78]">
                         Add products before proceeding to checkout.
                     </p>
 
                     <Link
                         href="/shop"
-                        className="mt-6 inline-flex rounded-full bg-[#52634F] px-6 py-3 text-sm font-semibold text-white"
+                        className="commerce-action mt-6 inline-flex rounded-full bg-[#287C78] px-6 py-3 text-sm font-semibold text-white"
                     >
                         Go to Shop
                     </Link>
@@ -127,11 +123,11 @@ export default function CheckoutPage() {
     }
 
     return (
-        <main className="min-h-screen bg-[#FBF8F3]">
+        <main className="commerce-page checkout-page min-h-screen bg-[#F4FAF8]">
             <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
                 <Link
                     href="/cart"
-                    className="inline-flex items-center gap-2 text-sm font-medium text-[#687169] hover:text-[#26352B]"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-[#617B78] hover:text-[#203C3B]"
                 >
                     <FiArrowLeft size={16} />
                     Back to Cart
@@ -140,17 +136,13 @@ export default function CheckoutPage() {
                 <motion.div
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mt-6"
+                    className="mt-4"
                 >
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#52634F]">
-                        Almost There
-                    </p>
-
-                    <h1 className="mt-2 text-3xl font-bold text-[#26352B] sm:text-4xl">
+                    <h1 className="mt-2 text-2xl font-semibold text-[#203C3B] sm:text-3xl">
                         Checkout
                     </h1>
 
-                    <p className="mt-2 text-sm text-[#687169]">
+                    <p className="mt-2 text-sm text-[#617B78]">
                         Enter your details to place your Cash on Delivery order.
                     </p>
                 </motion.div>
@@ -158,13 +150,14 @@ export default function CheckoutPage() {
                 <div className="mt-8 grid gap-6 md:grid-cols-[minmax(0,1fr)_300px] lg:grid-cols-[minmax(0,1fr)_350px]">
                     {/* Form */}
                     <motion.form
+                        id="delivery-form"
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.05 }}
                         onSubmit={handleSubmit}
-                        className="rounded-2xl border border-[#E7E2DA] bg-white p-5 sm:p-7"
+                        className="rounded-2xl border border-[#D9E7E3] bg-white p-5 sm:p-7"
                     >
-                        <h2 className="text-lg font-bold text-[#26352B]">
+                        <h2 className="text-lg font-bold text-[#203C3B]">
                             Delivery Details
                         </h2>
 
@@ -172,7 +165,7 @@ export default function CheckoutPage() {
                             <div>
                                 <label
                                     htmlFor="name"
-                                    className="mb-2 block text-sm font-medium text-[#26352B]"
+                                    className="mb-2 block text-sm font-medium text-[#203C3B]"
                                 >
                                     Full Name
                                 </label>
@@ -180,7 +173,7 @@ export default function CheckoutPage() {
                                 <div className="relative">
                                     <FiUser
                                         size={17}
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[#52634F]"
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[#287C78]"
                                     />
 
                                     <input
@@ -193,7 +186,7 @@ export default function CheckoutPage() {
                                             setName(event.target.value)
                                         }
                                         placeholder="Enter your name"
-                                        className="h-12 w-full rounded-xl border border-[#E1DBD2] bg-white pl-11 pr-4 text-sm text-[#26352B] outline-none focus:border-[#7B8A74] focus:ring-2 focus:ring-[#EFDCD6]"
+                                        className="h-12 w-full rounded-xl border border-[#D9E7E3] bg-white pl-11 pr-4 text-sm text-[#203C3B] outline-none focus:border-[#287C78] focus:ring-2 focus:ring-[#E5F2EF]"
                                     />
                                 </div>
                             </div>
@@ -201,7 +194,7 @@ export default function CheckoutPage() {
                             <div>
                                 <label
                                     htmlFor="phone"
-                                    className="mb-2 block text-sm font-medium text-[#26352B]"
+                                    className="mb-2 block text-sm font-medium text-[#203C3B]"
                                 >
                                     Phone Number
                                 </label>
@@ -209,7 +202,7 @@ export default function CheckoutPage() {
                                 <div className="relative">
                                     <FiPhone
                                         size={17}
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[#52634F]"
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[#287C78]"
                                     />
 
                                     <input
@@ -225,7 +218,7 @@ export default function CheckoutPage() {
                                             setPhone(event.target.value)
                                         }
                                         placeholder="Enter your phone number"
-                                        className="h-12 w-full rounded-xl border border-[#E1DBD2] bg-white pl-11 pr-4 text-sm text-[#26352B] outline-none focus:border-[#7B8A74] focus:ring-2 focus:ring-[#EFDCD6]"
+                                        className="h-12 w-full rounded-xl border border-[#D9E7E3] bg-white pl-11 pr-4 text-sm text-[#203C3B] outline-none focus:border-[#287C78] focus:ring-2 focus:ring-[#E5F2EF]"
                                     />
                                 </div>
                             </div>
@@ -233,7 +226,7 @@ export default function CheckoutPage() {
                             <div>
                                 <label
                                     htmlFor="address"
-                                    className="mb-2 block text-sm font-medium text-[#26352B]"
+                                    className="mb-2 block text-sm font-medium text-[#203C3B]"
                                 >
                                     Delivery Address
                                 </label>
@@ -241,7 +234,7 @@ export default function CheckoutPage() {
                                 <div className="relative">
                                     <FiMapPin
                                         size={17}
-                                        className="absolute left-4 top-4 text-[#52634F]"
+                                        className="absolute left-4 top-4 text-[#287C78]"
                                     />
 
                                     <textarea
@@ -254,30 +247,30 @@ export default function CheckoutPage() {
                                         }
                                         placeholder="Enter your complete address"
                                         rows={5}
-                                        className="w-full resize-none rounded-xl border border-[#E1DBD2] bg-white py-3 pl-11 pr-4 text-sm leading-6 text-[#26352B] outline-none focus:border-[#7B8A74] focus:ring-2 focus:ring-[#EFDCD6]"
+                                        className="w-full resize-none rounded-xl border border-[#D9E7E3] bg-white py-3 pl-11 pr-4 text-sm leading-6 text-[#203C3B] outline-none focus:border-[#287C78] focus:ring-2 focus:ring-[#E5F2EF]"
                                     />
                                 </div>
                             </div>
                         </div>
 
                         {/* Payment */}
-                        <div className="mt-7 border-t border-[#E7E2DA] pt-7">
-                            <h2 className="text-lg font-bold text-[#26352B]">
+                        <div className="mt-7 border-t border-[#D9E7E3] pt-7">
+                            <h2 className="text-lg font-bold text-[#203C3B]">
                                 Payment Method
                             </h2>
 
-                            <div className="mt-4 rounded-xl border border-[#7B8A74] bg-[#F7F6F1] p-4">
+                            <div className="mt-4 rounded-xl border border-[#287C78] bg-[#F4FAF8] p-4">
                                 <div className="flex items-start gap-3">
-                                    <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#7B8A74]">
-                                        <div className="h-2.5 w-2.5 rounded-full bg-[#52634F]" />
+                                    <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#287C78]">
+                                        <div className="h-2.5 w-2.5 rounded-full bg-[#287C78]" />
                                     </div>
 
                                     <div>
-                                        <p className="text-sm font-semibold text-[#26352B]">
+                                        <p className="text-sm font-semibold text-[#203C3B]">
                                             Cash on Delivery
                                         </p>
 
-                                        <p className="mt-1 text-xs leading-5 text-[#687169]">
+                                        <p className="mt-1 text-xs leading-5 text-[#617B78]">
                                             Pay when your order is delivered.
                                         </p>
                                     </div>
@@ -286,18 +279,10 @@ export default function CheckoutPage() {
                         </div>
 
                         {error && (
-                            <div role="alert" className="mt-5 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-600">
-                                {error}
-                            </div>
+                            <ErrorNotice className="mt-4" title="Your order couldn’t be placed">{error}</ErrorNotice>
                         )}
 
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="mt-7 flex h-12 w-full items-center justify-center rounded-xl bg-[#52634F] text-sm font-semibold text-white transition hover:bg-[#3C5141] disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                            {loading ? "Placing Order..." : "Place Order"}
-                        </button>
+
                     </motion.form>
 
                     {/* Summary */}
@@ -305,9 +290,9 @@ export default function CheckoutPage() {
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="h-fit rounded-2xl border border-[#E7E2DA] bg-white p-5 sm:p-7 lg:sticky lg:top-44"
+                        className="h-fit rounded-2xl border border-[#D9E7E3] bg-white p-5 sm:p-7 lg:sticky lg:top-24"
                     >
-                        <h2 className="text-lg font-bold text-[#26352B]">
+                        <h2 className="text-lg font-bold text-[#203C3B]">
                             Order Summary
                         </h2>
 
@@ -318,38 +303,34 @@ export default function CheckoutPage() {
                                     className="flex items-center justify-between gap-4"
                                 >
                                     <div className="min-w-0">
-                                        <p className="truncate text-sm font-medium text-[#26352B]">
+                                        <p className="truncate text-sm font-medium text-[#203C3B]">
                                             {item.name}
                                         </p>
 
-                                        <p className="mt-1 text-xs text-[#687169]">
+                                        <p className="mt-1 text-xs text-[#617B78]">
                                             Qty: {item.quantity}
                                         </p>
                                     </div>
 
-                                    <p className="shrink-0 text-sm font-semibold text-[#26352B]">
-                                        ₹{item.price * item.quantity}
+                                    <p className="shrink-0 text-sm font-semibold text-[#203C3B]">
+                                        ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                                     </p>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="my-6 border-t border-[#E7E2DA]" />
-
-                        <div className="flex items-center justify-between">
-                            <span className="font-semibold text-[#26352B]">
-                                Estimated subtotal
-                            </span>
-
-                            <span className="text-xl font-bold text-[#26352B]">
-                                ₹{total}
-                            </span>
-                        </div>
-
                         <DiscountCode items={items} onCode={setDiscountCode} />
-                        <p className="mt-3 text-xs leading-5 text-[#687169]">
+                        <p className="mt-3 text-xs leading-5 text-[#617B78]">
                             Pay on delivery. Prices and availability are confirmed when you place your order.
                         </p>
+                        <button
+                            type="submit"
+                            form="delivery-form"
+                            disabled={loading}
+                            className="commerce-action mt-7 flex h-12 w-full items-center justify-center rounded-xl bg-[#287C78] text-sm font-semibold text-white transition hover:bg-[#246662] disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                            {loading ? "Placing Order..." : "Place Order"}
+                        </button>
                     </motion.div>
                 </div>
             </div>

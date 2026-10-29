@@ -1,0 +1,94 @@
+.page { padding:32px 20px 48px; background:#F4FAF8; }
+.card { max-width:920px; margin:auto; display:grid; overflow:hidden; border:1px solid #D9E7E3; border-radius:18px; background:white; }
+.story { display:none; }
+.formPanel { padding:28px 24px; min-width:0; }
+.formBody { width:100%; max-width:360px; margin:auto; }
+.formBody h1 { margin:0; font-size:26px; line-height:1.2; letter-spacing:-.025em; color:#203C3B; }
+.subtitle { margin-top:10px; font-size:13px; line-height:1.6; color:#617B78; }
+.form { margin-top:24px; }
+.form > div + div { margin-top:16px; }
+.form label { display:block; margin-bottom:7px; font-size:12px; font-weight:500; color:#354F4D; }
+.form input { width:100%; height:48px; padding:12px 14px; font-size:16px; border-radius:9px; }
+.form input::placeholder { font-size:14px; }
+.submit { display:flex; width:100%; min-height:48px; justify-content:center; align-items:center; margin-top:24px; border-radius:9px; background:#203C3B; color:white; font-size:14px; font-weight:600; transition:background .2s; }
+.submit:hover { background:#287C78; }
+.submit:disabled { opacity:.6; }
+.switch { margin-top:24px; padding-top:20px; border-top:1px solid #D9E7E3; font-size:12px; line-height:1.8; text-align:center; color:#617B78; }
+.switch a { display:inline-flex; align-items:center; min-height:36px; margin-left:4px; font-weight:600; color:#203C3B; text-decoration:underline; text-underline-offset:3px; }
+.phone { display:flex; }
+.phone span { padding:0 12px; display:flex; align-items:center; border:1px solid #D9E7E3; border-right:0; border-radius:9px 0 0 9px; background:#E5F2EF; font-size:14px; color:#287C78; }
+.phone input { border-top-left-radius:0 !important; border-bottom-left-radius:0 !important; }
+.hint { margin-top:6px; font-size:11px; line-height:1.6; color:#617B78; }
+.password { position:relative; }
+.password input { padding-right:48px; }
+.password button { position:absolute; right:3px; top:2px; width:44px; height:44px; display:flex; align-items:center; justify-content:center; color:#617B78; border-radius:7px; }
+@media (min-width:768px) {
+ .page { padding:48px 24px 64px; }
+ .card { grid-template-columns:1fr 1fr; }
+ .story { display:flex; flex-direction:column; justify-content:center; padding:40px; background:#E5F2EF; color:#203C3B; }
+ .story > p:first-child { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.16em; }
+ .story h2 { font-family:Georgia,serif; font-size:32px; line-height:1.2; margin-top:20px; }
+ .story > p { font-size:14px; line-height:1.8; margin-top:20px; }
+ .story > div { font-size:12px; line-height:1.8; }
+ .formPanel { padding:36px; }
+}
+@media (max-width:374px) {
+ .page { padding:20px 12px 32px; }
+ .formPanel { padding:24px 18px; }
+ .formBody h1 { font-size:24px; }
+}
+
+@media (max-width:767px) {
+ .page { padding:16px 12px 28px; }
+ .card { max-width:420px; border-radius:14px; }
+ .formPanel { padding:22px 20px; }
+ .formBody h1 { font-family:Arial,Helvetica,sans-serif; font-size:21px; font-weight:600; line-height:1.25; letter-spacing:-.02em; }
+ .subtitle { margin-top:6px; font-size:12px; line-height:1.5; }
+ .form { margin-top:20px; }
+ .form > div + div { margin-top:12px; }
+ .form label { margin-bottom:5px; font-size:11px; }
+ .form input:not([type="checkbox"]):not([type="radio"]) { min-height:44px; height:44px; padding:10px 12px; border-radius:8px; }
+ .form input::placeholder { font-size:13px; }
+ .form .password input { padding-right:44px; }
+ .password button { height:40px; width:40px; }
+ .phone span { padding-inline:10px; font-size:13px; }
+ .hint { margin-top:4px; font-size:10px; }
+ .submit { min-height:44px; margin-top:18px; font-size:13px; border-radius:8px; }
+ .switch { margin-top:18px; padding-top:14px; font-size:11px; }
+}
+
+/* Soft botanical surfaces and motion, without adding vertical space. */
+.page { background:radial-gradient(ellipse at 12% 12%,#E5F2EF 0,transparent 45%),radial-gradient(ellipse at 95% 85%,#E5F2EF 0,transparent 40%),#F4FAF8; }
+.card { position:relative; border-color:#D9E7E3; box-shadow:0 12px 38px #203C3B09; }
+.card::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,#287C78,#D3E9E5,#E5F2EF); pointer-events:none; }
+.formBody h1 { position:relative; padding-left:14px; }
+.formBody h1::before { content:""; position:absolute; left:0; top:4px; width:4px; height:calc(100% - 8px); border-radius:9px; background:#75A8A0; }
+.form > div { transition:transform .2s; }
+.form input:not([type="checkbox"]):not([type="radio"]) { transition:border-color .2s,box-shadow .2s,background .2s; }
+.form input:not([type="checkbox"]):not([type="radio"]):focus { background:#fff; border-color:#75A8A0; box-shadow:0 0 0 3px #75A8A01f; }
+.password button { transition:color .2s,background .2s; }
+.password button:hover { background:#E5F2EF; color:#203C3B; }
+.submit { gap:9px; background:linear-gradient(115deg,#203C3B,#246662); box-shadow:0 4px 12px #203C3B14; transition:transform .18s,box-shadow .18s,filter .18s; }
+.submit:hover:not(:disabled) { box-shadow:0 7px 18px #203C3B24; filter:brightness(1.08); }
+.submit:active:not(:disabled) { transform:scale(.985); box-shadow:0 2px 5px #203C3B15; }
+.submit[aria-busy="true"]::before { content:""; width:15px; height:15px; border:2px solid #ffffff55; border-top-color:white; border-radius:50%; }
+.switch a { transition:color .2s,text-decoration-color .2s; }
+.switch a:hover { color:#287C78; text-decoration-color:#75A8A0; }
+.story > p, .story > div { color:#287C78; }
+@media (prefers-reduced-motion:no-preference) {
+ .card { animation:cardIn .45s cubic-bezier(.22,1,.36,1) both; }
+ .formBody > h1, .subtitle { animation:fieldIn .4s ease-out backwards; }
+ .subtitle { animation-delay:60ms; }
+ .form > div { animation:fieldIn .4s ease-out backwards; }
+ .form > div:nth-child(1) { animation-delay:80ms; }
+ .form > div:nth-child(2) { animation-delay:130ms; }
+ .form > div:nth-child(3) { animation-delay:180ms; }
+ .form > div:nth-child(4) { animation-delay:230ms; }
+ .submit { animation:fieldIn .4s 260ms ease-out backwards; }
+ .switch { animation:fieldIn .4s 300ms ease-out backwards; }
+ .submit:hover:not(:disabled) { transform:translateY(-1px); }
+ .submit[aria-busy="true"]::before { animation:spin .7s linear infinite; }
+ @keyframes cardIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+ @keyframes fieldIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+ @keyframes spin { to { transform:rotate(360deg); } }
+}

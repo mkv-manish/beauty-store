@@ -62,12 +62,12 @@ export default function ProductDetails({ product }: { product: ProductData }) {
     }
 
     return (
-        <main className="min-h-screen bg-[#FBF8F3]">
+        <main className="commerce-page product-page min-h-screen bg-[#F4FAF8]">
             <div className="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-12">
                 {/* Back */}
                 <Link
                     href="/shop"
-                    className="mb-7 inline-flex items-center gap-2 text-sm font-medium text-[#687169] transition hover:text-[#26352B]"
+                    className="mb-7 inline-flex items-center gap-2 text-sm font-medium text-[#617B78] transition hover:text-[#203C3B]"
                 >
                     <FiArrowLeft size={16} />
                     Back to Shop
@@ -79,10 +79,10 @@ export default function ProductDetails({ product }: { product: ProductData }) {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="relative h-fit overflow-hidden rounded-3xl border border-[#E7E2DA] bg-white"
+                        className="relative h-fit overflow-hidden rounded-3xl border border-[#D9E7E3] bg-white"
                     >
                         <div className="absolute right-3 top-3 z-10"><WishlistButton id={product._id} name={product.name} /></div>
-                        <div className="aspect-square bg-[#F4EEE7]">
+                        <div className="aspect-square bg-[#EFF7F5]">
                             <Image
                                 src={activeImage}
                                 alt={product.name}
@@ -93,7 +93,7 @@ export default function ProductDetails({ product }: { product: ProductData }) {
                                 className="h-full w-full object-cover"
                             />
                         </div>
-                        {images.length > 1 && <div className="flex gap-3 overflow-x-auto p-3" aria-label="Product images">{images.map((src, index) => <button key={src} type="button" aria-label={`View product image ${index + 1}`} aria-pressed={activeImage === src} onClick={() => setActiveImage(src)} className={`shrink-0 overflow-hidden rounded-xl border-2 ${activeImage === src ? "border-[#52634F]" : "border-transparent"}`}><Image src={src} alt={`${product.name}, view ${index + 1}`} width={64} height={64} sizes="64px" /></button>)}</div>}
+                        {images.length > 1 && <div className="flex gap-3 overflow-x-auto p-3" aria-label="Product images">{images.map((src, index) => <button key={src} type="button" aria-label={`View product image ${index + 1}`} aria-pressed={activeImage === src} onClick={() => setActiveImage(src)} className={`shrink-0 overflow-hidden rounded-xl border-2 ${activeImage === src ? "border-[#287C78]" : "border-transparent"}`}><Image src={src} alt={`${product.name}, view ${index + 1}`} width={64} height={64} sizes="64px" /></button>)}</div>}
                     </motion.div>
 
                     {/* Details */}
@@ -103,45 +103,23 @@ export default function ProductDetails({ product }: { product: ProductData }) {
                         transition={{ duration: 0.5, delay: 0.05 }}
                         className="flex flex-col justify-center"
                     >
-                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#52634F]">
+                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#287C78]">
                             {categoryLabel(product.category)}
                         </p>
 
-                        <h1 className="mt-3 text-3xl font-bold leading-tight tracking-tight text-[#26352B] sm:text-4xl">
+                        <h1 className="mt-3 text-2xl font-semibold leading-tight tracking-tight text-[#203C3B] sm:text-3xl">
                             {product.name}
                         </h1>
 
-                        <p className="mt-4 text-2xl font-bold text-[#26352B]">
-                            ₹{product.price}
+                        <p className="mt-4 text-2xl font-bold text-[#203C3B]">
+                            ₹{product.price.toLocaleString("en-IN")}
                         </p>
 
-                        <div className="mt-6 h-px bg-[#E7E2DA]" />
+                        <div className="mt-6 h-px bg-[#D9E7E3]" />
 
-                        <p className="mt-6 text-sm leading-7 text-[#687169] sm:text-base">
+                        <p className="mt-6 text-sm leading-7 text-[#617B78] sm:text-base">
                             {product.description}
                         </p>
-
-                        {/* Ingredients */}
-                        <div className="mt-7">
-                            <h2 className="text-sm font-semibold text-[#26352B]">
-                                Ingredients
-                            </h2>
-
-                            <p className="mt-2 text-sm leading-6 text-[#687169]">
-                                {product.ingredients}
-                            </p>
-                        </div>
-
-                        {/* How To Use */}
-                        <div className="mt-6">
-                            <h2 className="text-sm font-semibold text-[#26352B]">
-                                How to Use
-                            </h2>
-
-                            <p className="mt-2 text-sm leading-6 text-[#687169]">
-                                {product.howToUse}
-                            </p>
-                        </div>
 
                         {/* Stock */}
                         <div className="mt-6">
@@ -159,21 +137,21 @@ export default function ProductDetails({ product }: { product: ProductData }) {
                         {/* Quantity */}
                         {!outOfStock && (
                             <div className="mt-5">
-                                <p className="mb-2 text-sm font-medium text-[#26352B]">
+                                <p className="mb-2 text-sm font-medium text-[#203C3B]">
                                     Quantity
                                 </p>
 
-                                <div className="flex w-fit items-center overflow-hidden rounded-xl border border-[#DDD7CE] bg-white">
+                                <div className="flex w-fit items-center overflow-hidden rounded-xl border border-[#D9E7E3] bg-white">
                                     <button
                                         type="button"
                                         aria-label="Decrease quantity" onClick={decreaseQuantity}
                                         disabled={quantity <= 1}
-                                        className="flex h-11 w-11 items-center justify-center text-[#26352B] transition hover:bg-[#F4EEE7] disabled:cursor-not-allowed disabled:opacity-40"
+                                        className="flex h-11 w-11 items-center justify-center text-[#203C3B] transition hover:bg-[#EFF7F5] disabled:cursor-not-allowed disabled:opacity-40"
                                     >
                                         <FiMinus size={16} />
                                     </button>
 
-                                    <span className="flex h-11 min-w-12 items-center justify-center border-x border-[#DDD7CE] text-sm font-semibold text-[#26352B]">
+                                    <span className="flex h-11 min-w-12 items-center justify-center border-x border-[#D9E7E3] text-sm font-semibold text-[#203C3B]">
                                         {quantity}
                                     </span>
 
@@ -181,7 +159,7 @@ export default function ProductDetails({ product }: { product: ProductData }) {
                                         type="button"
                                         aria-label="Increase quantity" onClick={increaseQuantity}
                                         disabled={quantity >= product.stock}
-                                        className="flex h-11 w-11 items-center justify-center text-[#26352B] transition hover:bg-[#F4EEE7] disabled:cursor-not-allowed disabled:opacity-40"
+                                        className="flex h-11 w-11 items-center justify-center text-[#203C3B] transition hover:bg-[#EFF7F5] disabled:cursor-not-allowed disabled:opacity-40"
                                     >
                                         <FiPlus size={16} />
                                     </button>
@@ -194,7 +172,7 @@ export default function ProductDetails({ product }: { product: ProductData }) {
                             type="button"
                             onClick={handleAddToCart}
                             disabled={outOfStock}
-                            className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#52634F] px-5 text-sm font-semibold text-white transition hover:bg-[#3C5141] disabled:cursor-not-allowed disabled:bg-[#B9BEB6]"
+                            className="commerce-action mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#287C78] px-5 text-sm font-semibold text-white transition hover:bg-[#246662] disabled:cursor-not-allowed disabled:bg-[#849B97]"
                         >
                             <FiShoppingBag size={18} />
 
@@ -205,12 +183,35 @@ export default function ProductDetails({ product }: { product: ProductData }) {
                             <motion.p
                                 initial={{ opacity: 0, y: 5 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="mt-3 flex items-center justify-center gap-2 text-sm font-medium text-[#52634F]"
+                                role="status"
+                                className="mt-3 flex items-center justify-center gap-2 text-sm font-medium text-[#287C78]"
                             >
                                 <FiCheck size={16} />
                                 {message}
                             </motion.p>
                         )}
+                        {/* Ingredients */}
+                        <div className="mt-7">
+                            <h2 className="text-sm font-semibold text-[#203C3B]">
+                                Ingredients
+                            </h2>
+
+                            <p className="mt-2 text-sm leading-6 text-[#617B78]">
+                                {product.ingredients}
+                            </p>
+                        </div>
+
+                        {/* How To Use */}
+                        <div className="mt-6">
+                            <h2 className="text-sm font-semibold text-[#203C3B]">
+                                How to Use
+                            </h2>
+
+                            <p className="mt-2 text-sm leading-6 text-[#617B78]">
+                                {product.howToUse}
+                            </p>
+                        </div>
+
                     </motion.div>
                 </div>
                 <ProductReviews id={product._id} />

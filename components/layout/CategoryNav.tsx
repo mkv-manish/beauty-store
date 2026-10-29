@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { categories, isCategory } from "@/config/categories";
 import CategoryIcon from "@/components/ui/CategoryIcon";
-const navigation = [{ id: "all", label: "For You", icon: "leaf", href: "/shop" }, ...categories.map(category => ({ ...category, href: `/shop?category=${category.id}` }))];
+const navigation = [{ id: "all", label: "Shop All", icon: "leaf", href: "/shop" }, ...categories.map(category => ({ ...category, href: `/shop?category=${category.id}` }))];
 export default function CategoryNav() {
   const params = useSearchParams();
   const requested = params.get("category");

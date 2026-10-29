@@ -5,6 +5,7 @@ import { FiArrowUpRight, FiCheck, FiCopy } from "react-icons/fi";
 import { LeafIcon } from "@/components/ui/BeautyIcons";
 import type { Offer } from "@/types/discount";
 import styles from "./CouponBanner.module.css";
+import ErrorNotice from "@/components/ui/ErrorNotice";
 export default function CouponBanner({ offers }: { offers: Offer[] }) {
   const codeField = useRef<HTMLInputElement>(null);
   const [copied, setCopied] = useState<string | null>(null);
@@ -37,7 +38,7 @@ export default function CouponBanner({ offers }: { offers: Offer[] }) {
       <div className={styles.divider} />
       <label htmlFor="home-offer-code" className={styles.codeLabel}>Use this code at checkout</label>
       <div className={styles.code}><input ref={codeField} id="home-offer-code" type="text" readOnly value={offer.code} aria-label="Discount code" /><button type="button" disabled={copying} onClick={copy} aria-label={`Copy discount code ${offer.code}`}>{saved ? <FiCheck size={18} /> : <FiCopy size={18} />}<span>{copying ? "Copying…" : saved ? "Copied!" : "Copy code"}</span></button></div>
-      <p className={styles.status} role="status">{error || (saved ? `${offer.code} copied. Your little saving is ready.` : "Copy. Shop. Add a little care to your day.")}</p>
+      {error ? <ErrorNotice className="mt-3">{error}</ErrorNotice> : <p className={styles.status} role="status">{saved ? `${offer.code} copied. Your little saving is ready.` : "Copy. Shop. Add a little care to your day."}</p>}
     </div>
   </div></section>;
 }

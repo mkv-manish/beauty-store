@@ -37,9 +37,9 @@ function SyncedSearch() {
   }, [value, urlSearch, query, editing, composing, router]);
   function submit(event: FormEvent) { event.preventDefault(); if (!composing) navigate(); }
   return <form role="search" aria-label="Product search" aria-busy={pending} className="store-search" onSubmit={submit}>
-    <FiSearch size={20} aria-hidden="true" className={`shrink-0 text-[#687169] ${pending ? "animate-pulse" : ""}`} />
+    <FiSearch size={20} aria-hidden="true" className={`shrink-0 text-[#617B78] ${pending ? "animate-pulse" : ""}`} />
     <input ref={input} aria-label="Search products" type="search" name="search" maxLength={100} value={value} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} onCompositionStart={() => setComposing(true)} onCompositionEnd={() => setComposing(false)} onChange={event => { setValue(event.target.value); setEditing(true); }} placeholder="Search skin & hair care" autoComplete="off" className="store-search-input" />
     {value && <button type="button" aria-label="Clear search" className="search-clear" onClick={() => { setValue(""); setEditing(true); input.current?.focus(); }}><FiX size={17} /></button>}
   </form>;
 }
-export default function SearchBar() { return <Suspense fallback={<div className="h-12 animate-pulse rounded-xl bg-[#F1F3EC]" />}><SyncedSearch /></Suspense>; }
+export default function SearchBar() { return <Suspense fallback={<div className="h-12 animate-pulse rounded-xl bg-[#EFF7F5]" />}><SyncedSearch /></Suspense>; }
